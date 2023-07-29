@@ -33,7 +33,6 @@ const UserSchema = new mongoose.Schema({
       type: [Number], // longitude, then latitude
       required: true
     },
-    index: '2dsphere',
   },
   // END SECTION: personally identifiable information
 
@@ -55,7 +54,7 @@ const UserSchema = new mongoose.Schema({
 
   // BEGIN SECTION: dating history
   // the user is currently waiting for a room
-  waitingForRoom: {type: Boolean, required: true, default: false, index: true},
+  waitingForRoom: {type: Boolean, required: true, default: true, index: true},
   // the user is a beginner
   isBeginner: {type: Boolean, required: true, default: true},
 

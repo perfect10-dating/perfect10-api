@@ -1,4 +1,4 @@
-import UserModel from "../../models/UserModel";
+const UserModel = require("../../models/UserModel");
 
 module.exports = (router) => {
     router.post('/create-user', async (req, res) => {

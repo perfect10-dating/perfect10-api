@@ -13,19 +13,19 @@ const options = {
   definition: {
     openapi: '3.0.1',
     info: {
-      title: 'qBraid API',
+      title: 'Perfect10 API',
       version: '1.0.0',
-      description: 'qBraid Express API',
+      description: 'Perfect10 Express API',
     },
     servers: [
-      {
-        url: 'https://api.qbraid.com',
-        description: 'Live Server'
-      },
-      {
-        url: 'https://api-staging.qbraid.com',
-        description: 'Staging Server'
-      }
+      // {
+      //   url: 'https://api.qbraid.com',
+      //   description: 'Live Server'
+      // },
+      // {
+      //   url: 'https://api-staging.qbraid.com',
+      //   description: 'Staging Server'
+      // }
     ]
   },
   apis: ['./routes/*.js', './routes/**/*.js'],

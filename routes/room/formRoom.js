@@ -1,5 +1,5 @@
-import UserModel from "../../models/UserModel";
-import RoomModel from "../../models/RoomModel";
+const UserModel = require("../../models/UserModel");
+const RoomModel = require("../../models/RoomModel");
 
 const formRoomFunction = (userId) => {
     return new Promise((resolve, reject) => {
@@ -47,7 +47,7 @@ const formRoomFunction = (userId) => {
                                         }
                                     }
                                 }
-                            }).limit(10).select("_id"),
+                            }).limit(10).select(["_id", "waitingForRoom"]),
 
                             // if it's one-sided, competitors=dates
                             isOneSided ? new Promise((resolve, reject) => resolve()) :
@@ -78,7 +78,7 @@ const formRoomFunction = (userId) => {
                                         }
                                     }
                                 }
-                            }).limit(9).select("_id"),
+                            }).limit(9).select(["_id", "waitingForRoom"]),
                         ])
 
                         if (isOneSided) {
@@ -116,6 +116,9 @@ const formRoomFunction = (userId) => {
                                 console.error(err)
                                 return reject("Error saving a new room")
                             }
+
+                            // TODO -- change both lists to mark them as no longer waiting for a room
+                            // wait until I've debugged this, though
 
                             return resolve({
                                 dates, competitors
