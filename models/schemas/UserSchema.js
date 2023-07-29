@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   // the person MUST have a unique phone number
   phoneNumber: {type: String, required: true, unique: true, index: true},
   // if the person has an email address, it MUST be unique
-  emailAddress: {type: String, unique: true},
+  emailAddress: {type: String},
   // the first name (displayed)
   firstName: {type: String, required: true},
   // the last name (optional)
@@ -42,8 +42,8 @@ const UserSchema = new mongoose.Schema({
 
   // the age range that we'll match this person with
   ageRange: {
-    minimum: {type: Number, required: true},
-    maximum: {type: Number, required: true},
+    min: {type: Number, required: true},
+    max: {type: Number, required: true},
   },
 
   // distance in miles that the match can be.
