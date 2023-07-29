@@ -1,9 +1,9 @@
 const UserModel = require("../../models/UserModel");
 const RoomModel = require("../../models/RoomModel");
 
-const formRoomFunction = (userId) => {
+const formRoomFunction = (cognitoId) => {
     return new Promise((resolve, reject) => {
-        UserModel.findOne({_id: userId}).lean()
+        UserModel.findOne({cognitoId})
             .exec()
             .catch(err => {
                 console.error(err)
@@ -31,6 +31,8 @@ const formRoomFunction = (userId) => {
                         let [dates, competitors] = await Promise.all([
                             // find dates near these coordinates
                             UserModel.find({
+                                // not the same _id
+                                _id: {$ne: user._id},
                                 // is waiting
                                 waitingForRoom: true,
                                 // matches beginner value
@@ -65,7 +67,9 @@ const formRoomFunction = (userId) => {
 
                             // find competitors near these coordinates
                             UserModel.find({
-                                // // is waiting
+                                // not the same _id
+                                _id: {$ne: user._id},
+                                // is waiting
                                 waitingForRoom: true,
                                 // matches beginner value
                                 isBeginner: user.isBeginner,
