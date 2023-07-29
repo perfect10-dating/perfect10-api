@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema({
   identity: {type: String, required: true},
   // the person's age (in years)
   age: {type: Number, required: true},
+  dateOfBirth: {type: Date, required: true},
   // location (a
   location: {
     type: {
@@ -53,6 +54,11 @@ const UserSchema = new mongoose.Schema({
   // END SECTION: dating preferences
 
   // BEGIN SECTION: dating history
+  // the user is currently waiting for a room
+  waitingForRoom: {type: Boolean, required: true, default: false, index: true},
+  // the user is a beginner
+  isBeginner: {type: Boolean, required: true, default: true},
+
   totalScore: {type: Number, required: true, default: 0},
   // this will be rescored based on total score and adjustments
   roomScore: {type: Number, required: true, default: 5},

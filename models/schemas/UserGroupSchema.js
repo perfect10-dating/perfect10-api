@@ -7,10 +7,10 @@ const requiredString = { type: String, required: true }
 // A schema to organize the queues of people that can be used to build a room
 const UserGroupSchema = new mongoose.Schema({
 
-    // gender of person (man, woman, transMan, transWoman, nonbinary)
+    // gender of group (man, woman, transMan, transWoman, nonbinary)
     gender: {type: String, required: true},
 
-    // what this person is looking for
+    // what this group is looking for
     lookingFor: [{type: String, required: true}],
 
     // age (18-22, 23-27, 28-32, 33-37, etc.)
