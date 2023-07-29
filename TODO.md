@@ -26,6 +26,7 @@ shows you how many people in each of those groups are seeking men)
 ## Room
 1. Form room from available users
 2. Replace user in room
+3. Display information required for a room interface
 
 ## User
 1. Create new user

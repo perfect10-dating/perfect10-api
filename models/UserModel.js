@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
-const VideoSchema = require('./schemas/VideoSchema')
+const UserSchema = require('./schemas/UserSchema')
 
-const VideoModel = mongoose.model('video', VideoSchema)
+const UserModel = mongoose.model('user', UserSchema)
 
-module.exports = VideoModel
+module.exports = UserModel

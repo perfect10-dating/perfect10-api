@@ -4,21 +4,20 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 
 const requiredString = { type: String, required: true }
 
-const VideoSchema = new mongoose.Schema({
+const RoomSchema = new mongoose.Schema({
   
-  // various information that YouTube gives to us normally
-  channelId: requiredString,
-  channelTitle: requiredString,
-  id: requiredString,
-  regionCode: String,
-  thumbnails: Mixed,
-  
-  // index based on the title of the video, prevent duplicates
-  title: {type: String, required: true, index: true, unique: true},
-  
-  // TODO -- additional information that we need
-  language: {type: String, required: true, index: true},
+  // number of people in the room (to start with: 10 or 20 for single or double-sided rooms)
+  numPeople: {type: Number, required: true},
+
+  // if the room is single-sided (otherwise is double-sided)
+  isSingleSided: {type: Boolean, required: true},
+
+  // the first side of the room
+  sideOne: [{type: ObjectId, ref: 'user', required: true}],
+
+  // the second side of the room (empty if single-sided)
+  sideTwo: [{type: ObjectId, ref: 'user', required: true}],
 
 }, {timestamps: true})
 
-module.exports = VideoSchema
+module.exports = RoomSchema

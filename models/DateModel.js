@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
-const VideoSchema = require('./schemas/VideoSchema')
+const DateSchema = require('./schemas/DateSchema')
 
-const DateModel = mongoose.model('video', VideoSchema)
+const DateModel = mongoose.model('date', DateSchema)
 
 module.exports = DateModel

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
-const VideoSchema = require('./schemas/VideoSchema')
+const RoomSchema = require('./schemas/RoomSchema')
 
-const VideoModel = mongoose.model('video', VideoSchema)
+const RoomModel = mongoose.model('room', RoomSchema)
 
-module.exports = VideoModel
+module.exports = RoomModel
