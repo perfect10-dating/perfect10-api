@@ -1,5 +1,6 @@
 const UserModel = require("../../models/UserModel");
 const RoomModel = require("../../models/RoomModel");
+const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 
 const formRoomFunction = (cognitoId) => {
     return new Promise((resolve, reject) => {
@@ -30,70 +31,18 @@ const formRoomFunction = (cognitoId) => {
                     try {
                         let [dates, competitors] = await Promise.all([
                             // find dates near these coordinates
-                            UserModel.find({
-                                // not the same _id
-                                _id: {$ne: user._id},
-                                // is waiting
-                                waitingForRoom: true,
-                                // matches beginner value
-                                isBeginner: user.isBeginner,
-                                // is looking for this user
-                                lookingFor: user.identity,
-                                // the user is looking for them
-                                identity: choice,
-                                // in the age range
-                                age: {$lte: user.ageRange.max, $gte: user.ageRange.min},
-                                // // both ways
-                                "ageRange.max": {$gte: user.age},
-                                "ageRange.min": {$lte: user.age},
-
-                                location: {
-                                    $near: {
-                                        // convert distance in miles to meters, measure only radially
-                                        $maxDistance: (user.maxDistance / 2) * 1609,
-                                        $geometry: {
-                                            type: "Point",
-                                            coordinates: user.location.coordinates
-                                        }
-                                    }
-                                }
-                            })
+                            // identity and choice are flipped, because we want to find someone who is LOOKING FOR
+                            // the user
+                            UserModel.find(roomSelectionCriteria(user, user.identity, choice))
                                 .limit(10)
                                 .select(["_id", "waitingForRoom", "location", "identity"])
                                 .exec(),
 
                             // if it's one-sided, competitors=dates
-                            isOneSided ? new Promise((resolve, reject) => resolve()) :
+                            isOneSided ? new Promise((resolve, reject) => resolve([])) :
 
                             // find competitors near these coordinates
-                            UserModel.find({
-                                // not the same _id
-                                _id: {$ne: user._id},
-                                // is waiting
-                                waitingForRoom: true,
-                                // matches beginner value
-                                isBeginner: user.isBeginner,
-                                // is looking for similar dates
-                                lookingFor: choice,
-                                // the user is looking for them
-                                identity: user.identity,
-                                // in the age range
-                                age: {$lte: user.ageRange.max, $gte: user.ageRange.min},
-                                // // they are also less or equally selective than the user
-                                "ageRange.max": {$gte: user.ageRange.max},
-                                "ageRange.min": {$lte: user.ageRange.min},
-
-                                location: {
-                                    $near: {
-                                        // convert distance in miles to meters, measure only radially
-                                        $maxDistance: (user.maxDistance / 2) * 1609,
-                                        $geometry: {
-                                            type: "Point",
-                                            coordinates: user.location.coordinates
-                                        }
-                                    }
-                                }
-                            })
+                            UserModel.find(roomSelectionCriteria(user, choice, user.identity))
                                 .limit(9)
                                 .select(["_id", "waitingForRoom", "location", "identity"])
                                 .exec(),
@@ -123,10 +72,13 @@ const formRoomFunction = (cognitoId) => {
                         console.log("finished manipulating arrays")
 
                         let room = new RoomModel({
+                            spawningUser: user,
                             numPeople: dates.length + competitors.length,
                             isSingleSided: isOneSided,
                             sideOne: dates,
+                            sideOneIdentity: choice,
                             sideTwo: competitors,
+                            sideTwoIdentity: identity,
                         })
 
                         console.log("Saving room")
