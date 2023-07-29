@@ -10,13 +10,11 @@ system and in the room matchmaker
 2. Accept / Record date between two users in room
 3. Propose setup
 4. Accept / Record setup between two users in room
-5. Review date / edit user score
-6. Release both users to now choose to join a new room
+5. Review date / edit user score / release user
 
 ## Entry
 1. Join entry queue
 2. Gain priority in entry queue
-3. Pop from queue into available users
 
 ## Global
 1. Display potential room options (i.e., if you are a man seeking bio women,
@@ -35,7 +33,4 @@ shows you how many people in each of those groups are seeking men)
 3. Switch groups (3 days)
 4. Switch groups (timeout)
 5. Switch groups (paid)
-6. Propose date / accept date
-7. Set up a friend / accept set up
-8. Review a date
 9. Choose to join a new room

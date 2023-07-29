@@ -13,8 +13,32 @@ router.use(async function (req, res, next) {
 // END ROUTE AUTHENTICATION
 
 // BEGIN CUSTOM ROUTE REGISTRATION
-require('./get-translations')(router)
-require('./get-recommendations')(router)
+// date routes
+require('./date/accept')(router)
+require('./date/acceptSetup')(router)
+require('./date/propose')(router)
+require('./date/proposeSetup')(router)
+require('./date/review')(router)
+
+// entry routes
+require('./entry/gainQueuePriority')(router)
+require('./entry/joinQueue')(router)
+
+// global
+require('./global/displayRoomOptions')(router)
+
+// room
+require('./room/displayRoom')(router)
+require('./room/formRoom')(router)
+require('./room/replaceUserInRoom')(router)
+
+// user
+require('./user/create')(router)
+require('./user/edit')(router)
+require('./user/joinNewRoom')(router)
+require('./user/switchGroups')(router)
+require('./user/uploadPhotos')(router)
+
 // END CUSTOM ROUTE REGISTRATION
 
 module.exports = router

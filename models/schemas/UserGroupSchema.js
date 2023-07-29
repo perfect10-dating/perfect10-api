@@ -5,7 +5,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const requiredString = { type: String, required: true }
 
 // A schema to organize the queues of people that can be used to build a room
-const UserQueueSchema = new mongoose.Schema({
+const UserGroupSchema = new mongoose.Schema({
 
     // gender of person (man, woman, transMan, transWoman, nonbinary)
     gender: {type: String, required: true},
@@ -37,4 +37,4 @@ const UserQueueSchema = new mongoose.Schema({
 
 }, {timestamps: true})
 
-module.exports = UserQueueSchema
+module.exports = UserGroupSchema
