@@ -14,12 +14,12 @@ router.use(async function (req, res, next) {
 
 // BEGIN CUSTOM ROUTE REGISTRATION
 // date routes
-// require('./date/accept')(router)
-// require('./date/acceptSetup')(router)
-// require('./date/propose')(router)
-// require('./date/proposeSetup')(router)
-// require('./date/review')(router)
-
+require('./date/accept')(router)
+require('./date/acceptSetup')(router)
+require('./date/propose')(router)
+require('./date/proposeSetup')(router)
+require('./date/review')(router)
+require('./date/viewProposedDates')(router)
 // entry routes
 // require('./entry/gainQueuePriority')(router)
 // require('./entry/joinQueue')(router)
@@ -30,13 +30,11 @@ router.use(async function (req, res, next) {
 // room
 // require('./room/displayRoom')(router)
 require('./room/formRoom')(router)
-// require('./room/replaceUserInRoom')(router)
 
 // user
 require('./user/create')(router)
 // require('./user/edit')(router)
-// require('./user/joinNewRoom')(router)
-// require('./user/switchGroups')(router)
+require('./user/switchGroups')(router)
 // require('./user/uploadPhotos')(router)
 
 // END CUSTOM ROUTE REGISTRATION
