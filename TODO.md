@@ -24,7 +24,8 @@ shows you how many people in each of those groups are seeking men)
 ## Room
 1. ~~Form room from available users~~
 2. ^ for above: indicate users are not waiting
-2. Replace user in room (utility function)
+3. ^ for above: build in the ranking matchmaker
+2. ~~Replace user in room (utility function)~~
 3. Display information required for a room interface
 
 ## User
@@ -32,6 +33,18 @@ shows you how many people in each of those groups are seeking men)
 2. Set and switch descriptors
 2. Upload photos and information
 3. Switch groups (3 days)
-4. Switch groups (timeout)
+4. Switch groups (timeout) (utility function)
 5. Switch groups (paid)
-9. Choose to join a new room
+9. ~~Choose to join a new room (duplicate with form room from available users)~~
+
+## Daemon
+1. Find dormant users and temporarily disable them
+
+## OTHER MACHINERY
+### How are timeliness operations triggered?
+1. A user in a "queue" to enter a room may be assigned to a room when either they
+or someone else looks at the site / app. This re-runs a query to try to assign
+them to a room.
+2. A user who has gone dormant (no interaction with the app for more than a week) is
+picked up by a daemon. If they choose to join a new room, they will be unmarked as dormant
+and will be able to join rooms as normal

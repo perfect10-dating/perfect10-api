@@ -5,14 +5,18 @@ const RoomModel = require("../../models/RoomModel");
 const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 const UserModel = require("../../models/UserModel");
 
-async function findRoomsWithUsers(userObject) {
+/*
+Finds any rooms that contain this user. Additional parameters may be specified (this might be done to see if a room
+is no longer suitable for a user)
+ */
+async function findRoomsWithUsers(userObject, additionalParameters) {
     return new Promise(async (resolve, reject) => {
         try {
             let [onSideOne, onSideTwo] = await Promise.all([
                 // find any room that has this user on SideOne
-                RoomModel.findOne({sideOne: userObject._id}).populate(["spawningUser"]).exec(),
+                RoomModel.findOne(Object.assign(additionalParameters, {sideOne: userObject._id})).populate(["spawningUser"]).exec(),
                 // find any room that has this user on SideTwo
-                RoomModel.findOne({sideTwo: userObject._id}).populate(["spawningUser"]).exec(),
+                RoomModel.findOne(Object.assign(additionalParameters, {sideTwo: userObject._id})).populate(["spawningUser"]).exec(),
             ])
 
             if (onSideTwo) {
@@ -33,7 +37,7 @@ Removes the user from a room and DOES NOT replace them
 async function removeUserFromRoom(userObject) {
     return new Promise(async (resolve, reject) => {
         try {
-            let {room, onSideTwo} = await findRoomsWithUsers(userObject)
+            let {room, onSideTwo} = await findRoomsWithUsers(userObject, {})
             // depending on what side we're on, find the user and remove them from that side
             let workingArray = []
             if (onSideTwo) {
@@ -69,7 +73,7 @@ Removes the user from a room and DOES replace them
 async function replaceUserInRoom(userObject) {
     return new Promise(async (resolve, reject) => {
         try {
-            let {room, onSideTwo} = await findRoomsWithUsers(userObject)
+            let {room, onSideTwo} = await findRoomsWithUsers(userObject, {})
 
             // set what the person is looking for and what their identity is
             let targetIdentity = onSideTwo ? room.sideTwoIdentity : sideOneIdentity
@@ -116,4 +120,4 @@ async function replaceUserInRoom(userObject) {
     })
 }
 
-module.exports = {removeUserFromRoom, replaceUserInRoom}
+module.exports = {findRoomsWithUsers, removeUserFromRoom, replaceUserInRoom}

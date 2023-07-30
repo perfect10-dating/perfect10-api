@@ -57,6 +57,8 @@ const UserSchema = new mongoose.Schema({
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
   // the user is a beginner
   isBeginner: {type: Boolean, required: true, default: true},
+  // the user gets to skip the entry queue (will implement this as a paid feature in the future?)
+  entryQueueSkipped: {type: Boolean, required: true, default: false},
 
   totalScore: {type: Number, required: true, default: 0},
   // this will be rescored based on total score and adjustments

@@ -13,6 +13,10 @@ const formRoomFunction = (cognitoId) => {
             else {
                 console.log(user)
 
+                if (user.temporarilyLocked || user.mustReviewDate) {
+                    return reject("User is unsuitable for spawning a new room")
+                }
+
                 // to simplify things: randomly choose one of the groups this person is interested in
                 let choice = user.lookingFor[Math.floor(Math.random() * user.lookingFor.length)]
 
