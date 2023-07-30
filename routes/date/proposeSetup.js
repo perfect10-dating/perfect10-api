@@ -7,7 +7,7 @@ This operation does NOT lock you or your prospective date
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
-    router.post('/propose-date', async (req, res) => {
+    router.post('/propose-setup', async (req, res) => {
         try {
             let {cognitoId, otherUserId, time} = req.body
 

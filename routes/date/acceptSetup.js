@@ -6,7 +6,7 @@ const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {replaceUserInRoom} = require("../room/replaceUserInRoom");
 module.exports = (router) => {
-    router.post('/accept-date', async (req, res) => {
+    router.post('/accept-setup', async (req, res) => {
         try {
             let {cognitoId, dateId} = req.body
 
