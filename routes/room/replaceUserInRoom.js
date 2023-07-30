@@ -6,18 +6,23 @@ const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 const UserModel = require("../../models/UserModel");
 
 /*
+NOTE: expects a user with currentRoom field that has not had lean() called.
+
 Finds any rooms that contain this user. Additional parameters may be specified (this might be done to see if a room
 is no longer suitable for a user)
  */
 async function findRoomsWithUsers(userObject, additionalParameters) {
     return new Promise(async (resolve, reject) => {
         try {
-            let [onSideOne, onSideTwo] = await Promise.all([
-                // find any room that has this user on SideOne
-                RoomModel.findOne(Object.assign(additionalParameters, {sideOne: userObject._id})).populate(["spawningUser"]).exec(),
-                // find any room that has this user on SideTwo
-                RoomModel.findOne(Object.assign(additionalParameters, {sideTwo: userObject._id})).populate(["spawningUser"]).exec(),
-            ])
+            let room = userObject.currentRoom.populate()
+            let onSideTwo = false
+
+            // scan side 2 to see if the user is on that side
+            for (let i = 0; i < room.sideTwo.length; i++) {
+                if (room.sideTwo + "" === userObject._id + "") {
+                    onSideTwo = true
+                }
+            }
 
             if (onSideTwo) {
                 resolve ({room: onSideTwo, onSideTwo: true})
