@@ -5,21 +5,21 @@ const UserGroupModel = require("../../models/UserGroupModel");
 // group detection range, in miles
 const GROUP_DETECTION_RANGE = 100
 
-function findClosestGroup(user) {
+function findClosestGroup(identity, lookingFor, age, coordinates) {
     return new Promise(async (resolve, reject) => {
         try {
             let group = await UserGroupModel.findOne({
-                gender: user.identity,
-                lookingFor: user.lookingFor,
-                minAge: {$gte: user.age},
-                maxAge: {$lte: user.age},
+                gender: identity,
+                lookingFor,
+                minAge: {$gte: age},
+                maxAge: {$lte: age},
                 location: {
                     $near: {
                         // convert distance in miles to meters, measure only radially
                         $maxDistance: (GROUP_DETECTION_RANGE) * 1609,
                         $geometry: {
                             type: "Point",
-                            coordinates: user.location.coordinates
+                            coordinates
                         }
                     }
                 }

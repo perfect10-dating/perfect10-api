@@ -5,7 +5,7 @@ Assumes that a matching group does not yet exist
 const UserGroupModel = require("../../models/UserGroupModel");
 // group detection range, in miles
 
-function generateGroup(user) {
+function generateGroup(identity, lookingFor, age, location, isBeginner) {
     return new Promise(async (resolve, reject) => {
         try {
             let minAge = 18
@@ -17,12 +17,12 @@ function generateGroup(user) {
             }
 
             let userGroup = new UserGroupModel({
-                gender: user.identity,
-                lookingFor: user.lookingFor,
+                gender: identity,
+                lookingFor: lookingFor,
                 minAge,
                 maxAge,
-                totalCount: user.isBeginner ? 0 : 1,
-                location: user.location
+                totalCount: isBeginner ? 0 : 1,
+                location,
             })
 
             let userGroupSaved = userGroup.save()

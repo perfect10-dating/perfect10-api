@@ -25,7 +25,7 @@ trans women, and non-binary people, it offers you 3 room options, and
 shows you how many people in each of those groups are seeking men)
 
 ## userGroup
-1. Generate new group (utility function)
+1. ~~Generate new group (utility function)~~
 2. ~~find closest group (utility function)~~
 
 ## Room
@@ -37,6 +37,7 @@ shows you how many people in each of those groups are seeking men)
 
 ## User
 1. ~~Create new user~~
+2. ^ set user group
 2. Set and switch descriptors
 2. Upload photos and information
 3. ~~Switch groups (3 days)~~
