@@ -14,6 +14,7 @@ module.exports = (router) => {
             location: {type: "Point", coordinates: req.body.locationCoords},
             lookingFor: req.body.lookingFor,
             ageRange: req.body.ageRange,
+            shortTerm: !!req.body.shortTerm,
         })
 
         if (req.body.age < 18 || req.body.age > 150) {

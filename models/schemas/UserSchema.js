@@ -40,6 +40,9 @@ const UserSchema = new mongoose.Schema({
   // the groups that this person may be looking for
   lookingFor: [{type: String, required: true}],
 
+  // if the person is interested in a short term relationship (defaults to long term)
+  shortTerm: {type: Boolean, required: true, default: false},
+
   // the age range that we'll match this person with
   ageRange: {
     min: {type: Number, required: true},

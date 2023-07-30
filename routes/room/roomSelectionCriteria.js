@@ -8,6 +8,7 @@ function roomSelectionCriteria(user, choice, identity) {
             isBeginner: user.isBeginner,
         // is looking for similar dates
         lookingFor: choice,
+        shortTerm: user.shortTerm,
         // the user is looking for them
         identity: identity,
         // in the age range
