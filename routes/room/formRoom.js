@@ -33,7 +33,7 @@ const formRoomFunction = (cognitoId) => {
                     // the user
                     UserModel.find(roomSelectionCriteria(user, user.identity, choice))
                         .limit(10)
-                        .select(["_id", "waitingForRoom", "location", "identity"])
+                        .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
                         .exec(),
 
                     // if it's one-sided, competitors=dates
@@ -42,7 +42,7 @@ const formRoomFunction = (cognitoId) => {
                         // find competitors near these coordinates
                         UserModel.find(roomSelectionCriteria(user, choice, user.identity))
                             .limit(9)
-                            .select(["_id", "waitingForRoom", "location", "identity"])
+                            .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
                             .exec(),
                 ])
 
@@ -81,10 +81,24 @@ const formRoomFunction = (cognitoId) => {
 
                 console.log("Saving room")
                 // save this new room
-                await room.save()
+                room = await room.save()
 
-                // TODO -- change both lists to mark them as no longer waiting for a room
-                // wait until I've debugged this, though
+                // mark dates and competitors as no longer waiting for a room, in this room
+                for (let i = 0; i < dates.length; i++) {
+                    dates[i].waitingForRoom = false
+                    dates[i].currentRoom = room._id
+                }
+                for (let i = 0; i < competitors.length; i++) {
+                    competitors[i].waitingForRoom = false
+                    competitors[i].currentRoom = room._id
+                }
+
+                // save all dates and competitors
+                await Promise.all([dates, competitors].map(userArray => {
+                    return Promise.all(userArray.map(indUser => {
+                        return indUser.save()
+                    }))
+                }))
 
                 console.log({dates, competitors})
 

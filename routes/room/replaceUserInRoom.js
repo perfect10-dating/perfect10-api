@@ -107,16 +107,20 @@ async function replaceUserInRoom(userObject) {
             await room.save()
             // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
             let newUser = await UserModel.findOne(roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity))
-                .select("_id")
+                .select(["_id", "waitingForRoom", "currentRoom"])
                 .exec()
 
             if (!newUser) {
                 return reject("Could not find a suitable user to replace original in room swap")
             }
+            newUser.waitingForRoom = false
+            newUser.currentRoom = room._id
+
             workingArray.push(newUser)
 
             // now re-save
             await room.save()
+            await newUser.save()
             resolve("Successfully swapped out the user")
         }
         catch (err) {
