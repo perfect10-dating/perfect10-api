@@ -6,11 +6,12 @@ Primarily changes will need to occur in the entry queue
 system and in the room matchmaker
 
 ## Date
-1. Propose date
+1. ~~Propose date~~
 2. Accept / Record date between two users in room
 3. Propose setup
 4. Accept / Record setup between two users in room
 5. Review date / edit user score / release user
+6. ~~Reject date~~
 
 ## Entry
 1. Join entry queue

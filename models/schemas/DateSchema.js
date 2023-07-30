@@ -8,6 +8,12 @@ const DateSchema = new mongoose.Schema({
 
   // whether the date is a set-up
   isSetup: {type: Boolean, required: true},
+
+  // the user proposing the date
+  proposer: {type: ObjectId, ref: 'user', index: true, required: true},
+
+  // whether the date has been accepted
+  isAccepted: {type: Boolean, required: true, default: false},
   
   // the users going on a date.
   // can be:
@@ -16,7 +22,7 @@ const DateSchema = new mongoose.Schema({
   users: [{type: ObjectId, required: true, ref: 'user', index: true}],
 
   // if is a setup: the user who has an affected dater profile (by proxy)
-  setupResponsibleUser: {type: ObjectId, ref: 'user', index: true},
+  setupResponsibleUser: {type: ObjectId, ref: 'user', index: true, sparse: true},
 
   // if is a setup: the provisional user profile for the set-ee (TODO -- is this needed?)
 

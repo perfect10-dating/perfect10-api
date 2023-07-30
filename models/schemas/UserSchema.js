@@ -55,6 +55,8 @@ const UserSchema = new mongoose.Schema({
   // BEGIN SECTION: dating history
   // the user is currently waiting for a room
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
+  // the current room that the user is in
+  currentRoom: {type: ObjectId, ref: "room", index: true},
   // the user is a beginner
   isBeginner: {type: Boolean, required: true, default: true},
   // the user gets to skip the entry queue (will implement this as a paid feature in the future?)
@@ -65,14 +67,18 @@ const UserSchema = new mongoose.Schema({
   roomScore: {type: Number, required: true, default: 5},
   // whether this is the first room someone is entering
   isNew: {type: Boolean, required: true, default: true},
+
   // in cases of switching -- the user must continue to wait (usually a 3-day timeout) before they join the next room
   // this will prevent waitingForRoom going back to "true"
   temporarilyLocked: {type: Boolean, required: true, default: true},
   // the time when the user will be unlocked (only relevant if temporarilyLocked is true)
   unlockTime: {type: Date, required: false},
+
   // user needs to review a date before they join a new room
   // this will prevent waitingForRoom going back to "true"
   mustReviewDate: {type: Boolean, required: true, default: false},
+  // the date that the user has to review in order to unlock
+  lockingDate: {type: ObjectId, ref: 'date'},
   // END SECTION: dating history
 
 }, {timestamps: true})
