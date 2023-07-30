@@ -10,7 +10,8 @@ system and in the room matchmaker
 2. ~~Accept / Record date between two users in room~~
 3. ~~Propose setup~~
 4. ~~Accept / Record setup between two users in room~~
-5. Review date / edit user score / release user
+5. ~~Review date / edit user score / release user~~
+6. ^ edit user score when reviewing date
 6. ~~Reject date~~
 7. ~~View Proposed Dates~~
 
