@@ -57,6 +57,8 @@ module.exports = (router) => {
 
             // swaps the setupResponsibleUser back into the room matchmaker
             await replaceUserInRoom(date.setupResponsibleUser)
+            date.setupResponsibleUser.waitingForRoom = true
+            await date.setupResponsibleUser.save()
 
             return res.status(200).json("Setup accepted")
         } catch (err) {

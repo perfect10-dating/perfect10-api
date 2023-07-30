@@ -53,6 +53,8 @@ module.exports = (router) => {
 
             // swap yourself out of your old room and into a new room
             await removeUserFromRoom(user)
+            user.waitingForRoom = true
+            await user.save()
 
             // TODO -- edit the other person's score based on your review
 
