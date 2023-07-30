@@ -7,11 +7,12 @@ system and in the room matchmaker
 
 ## Date
 1. ~~Propose date~~
-2. Accept / Record date between two users in room
-3. Propose setup
-4. Accept / Record setup between two users in room
+2. ~~Accept / Record date between two users in room~~
+3. ~~Propose setup~~
+4. ~~Accept / Record setup between two users in room~~
 5. Review date / edit user score / release user
 6. ~~Reject date~~
+7. ~~View Proposed Dates~~
 
 ## Entry
 1. Join entry queue
@@ -33,9 +34,10 @@ shows you how many people in each of those groups are seeking men)
 1. ~~Create new user~~
 2. Set and switch descriptors
 2. Upload photos and information
-3. Switch groups (3 days)
+3. ~~Switch groups (3 days)~~
 4. Switch groups (timeout) (utility function)
 5. Switch groups (paid)
+6. Log activity / time in (if timed out or temporarily suspended)
 9. ~~Choose to join a new room (duplicate with form room from available users)~~
 
 ## Daemon

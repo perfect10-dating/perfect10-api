@@ -25,7 +25,7 @@ module.exports = (router) => {
 
             let {_id} = user
 
-            // create a new date
+            // find the date
             let date = await DateModel.findOne({_id: dateId}).exec()
             let userInDate = false
             for (let i = 0; i < date.users.length; i++) {
