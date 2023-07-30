@@ -60,8 +60,6 @@ const UserSchema = new mongoose.Schema({
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
   // the current room that the user is in
   currentRoom: {type: ObjectId, ref: "room", index: true},
-  // the user is a beginner
-  isBeginner: {type: Boolean, required: true, default: true},
   // the user gets to skip the entry queue (will implement this as a paid feature in the future?)
   entryQueueSkipped: {type: Boolean, required: true, default: false},
 
