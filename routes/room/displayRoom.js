@@ -12,7 +12,7 @@ module.exports = (router) => {
                 return res.status(400).json("Specify your cognitoId")
             }
 
-            // get your own ID
+            // get your own ID, populating both sides of your room (which will be returned for you to view)
             let user = await UserModel.findOne({cognitoId})
                 .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom"])
                 .populate({

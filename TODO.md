@@ -24,12 +24,16 @@ system and in the room matchmaker
 trans women, and non-binary people, it offers you 3 room options, and
 shows you how many people in each of those groups are seeking men)
 
+## userGroup
+1. Generate new group (utility function)
+2. ~~find closest group (utility function)~~
+
 ## Room
 1. ~~Form room from available users~~
 2. ^ for above: indicate users are not waiting
 3. ^ for above: build in the ranking matchmaker
 2. ~~Replace user in room (utility function)~~
-3. Display information required for a room interface
+3. ~~Display information required for a room interface~~
 
 ## User
 1. ~~Create new user~~

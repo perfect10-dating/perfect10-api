@@ -57,6 +57,7 @@ module.exports = (router) => {
             await user.save()
 
             // TODO -- edit the other person's score based on your review
+            // will probably subtract 5 from the final score to create top/bottom bounds
 
             return res.status(200).json("Successfully reviewed date")
         }

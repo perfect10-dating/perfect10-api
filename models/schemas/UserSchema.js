@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   // the person's age (in years)
   age: {type: Number, required: true},
   dateOfBirth: {type: Date, required: true},
-  // location (a
+  // location (represents the user matchmaking location)
   location: {
     type: {
       type: String,
@@ -56,6 +56,9 @@ const UserSchema = new mongoose.Schema({
   // END SECTION: dating preferences
 
   // BEGIN SECTION: dating history
+  // the group the user is scored with respect to
+  userGroup: {type: ObjectId, required: true},
+
   // the user is currently waiting for a room
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
   // the current room that the user is in
@@ -65,7 +68,7 @@ const UserSchema = new mongoose.Schema({
 
   totalScore: {type: Number, required: true, default: 0},
   // this will be rescored based on total score and adjustments
-  roomScore: {type: Number, required: true, default: 5},
+  roomScore: {type: Number, required: true, default: 0},
   // whether this is the first room someone is entering
   isNew: {type: Boolean, required: true, default: true},
 

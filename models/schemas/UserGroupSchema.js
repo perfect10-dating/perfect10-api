@@ -21,19 +21,37 @@ const UserGroupSchema = new mongoose.Schema({
     // the total: free count plus any users in rooms
     totalCount: {type: Number, required: true, default: 0},
     // users available for rooms (not beginner rooms)
-    freeCount: {type: Number, required: true, default: 0},
+    // TODO -- maybe use lower fields
+    // freeCount: {type: Number, required: true, default: 0},
     // beginner users available for rooms
-    freeBeginnerCount: {type: Number, required: true, default: 0},
+    // freeBeginnerCount: {type: Number, required: true, default: 0},
     // END: counts
 
     // BEGIN: scores
-    // these both are always accurate
-    totalScore: {type: Number, required: true, default: 0},
+    // these all are always accurate
+    totalRoomScore: {type: Number, required: true, default: 0},
+    totalSquaredRoomScore: {type: Number, required: true, default: 0},
     totalDates: {type: Number, required: true, default: 0},
     // these both are periodically recalculated
     averageRoomScore: {type: Number, required: true, default: 0},
+    // StdDev is calculated as sqrt(totalSquaredRoomScore/totalCount - (totalRoomScore/totalCount)^2)
     roomScoreStdDev: {type: Number, required: true, default: 0},
     // END: scores
+
+    // BEGIN: localization
+    // the location is borrowed from the group spawning user
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'], // 'location.type' must be 'Point'
+            required: true
+        },
+        coordinates: {
+            type: [Number], // longitude, then latitude
+            required: true
+        },
+    },
+
 
 }, {timestamps: true})
 
