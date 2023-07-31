@@ -37,7 +37,8 @@ shows you how many people in each of those groups are seeking men)
 
 ## User
 1. ~~Create new user~~
-2. ^ set user group
+2. ~~^ set user group~~
+3. ~~^ set user groups PLURAL; i.e., looking for [men, women] --> [[men], [women]]~~
 2. Set and switch descriptors
 2. Upload photos and information
 3. ~~Switch groups (3 days)~~

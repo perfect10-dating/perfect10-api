@@ -11,12 +11,19 @@ module.exports = (router) => {
             return res.status(400).json("Age is too small or too large")
         }
 
-        let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, req.body.locationCoords)
-        if (!group) {
-            group = await generateGroup(req.body.identity, req.body.lookingFor, req.body.age, location, req.body.isBeginner)
+        // find all sub-groups; i.e, looking for [men, women] --> looking for [[men], [women]]
+        let groups = []
+        for (let lookingForIdentity of req.body.lookingFor) {
+            let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, req.body.locationCoords)
+            if (!group) {
+                group = await generateGroup(req.body.identity, req.body.lookingFor, req.body.age, location, req.body.isBeginner)
+            }
+            group.totalCount += 1
+            groups.push(group)
         }
-        group.totalCount += 1
-        group = await group.save()
+
+        // save the groups
+        await Promise.all(groups.map(group => group.save()))
 
         let user = new UserModel({
             cognitoId: req.body.cognitoId,
@@ -30,7 +37,7 @@ module.exports = (router) => {
             lookingFor: req.body.lookingFor,
             ageRange: req.body.ageRange,
             shortTerm: !!req.body.shortTerm,
-            userGroup: group,
+            userGroups: groups,
         })
 
         user.save().then((savedUser) => {

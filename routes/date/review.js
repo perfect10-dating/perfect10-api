@@ -17,12 +17,12 @@ module.exports = (router) => {
                 path: "lockingDate",
                 populate: [{
                     path: "setupResponsibleUser",
-                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroup"],
-                    populate: ["userGroup"]
+                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroups"],
+                    populate: ["userGroups"]
                 }, {
                     path: "users",
-                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroup"],
-                    populate: ["userGroup"]
+                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroups"],
+                    populate: ["userGroups"]
                 }]
             }).exec()
             if (!lockingDate) {
@@ -73,7 +73,25 @@ module.exports = (router) => {
             otherUser.totalDates = totalDates
             otherUser.roomScore = roomScore
 
-            let otherUserGroup = otherUser.
+            // save the new score
+            await otherUser.save()
+
+            // find the user group the other user belongs to
+            let otherUserGroups = otherUser.userGroups
+            for (let i = 0; i < otherUserGroups.length; i++) {
+                // calculate the new mean and std dev
+                otherUserGroups[i].totalDates += 1
+                otherUserGroups[i].totalRoomScore += otherUser.roomScore
+                otherUserGroups[i].totalSquaredRoomScore += Math.pow(otherUser.roomScore, 2)
+                otherUserGroups[i].averageRoomScore = otherUserGroups[i].totalRoomScore / otherUserGroups[i].totalCount
+                // stDev = sqrt(E(X^2) - E(X)^2)
+                otherUserGroups[i].roomScoreStdDev = Math.sqrt(
+                    otherUserGroups[i].totalSquaredRoomScore / otherUserGroups[i].totalCount
+                    - Math.pow(otherUserGroups[i].averageRoomScore, 2)
+                )
+            }
+
+            await Promise.all(otherUserGroups.map(group => group.save()))
 
             return res.status(200).json("Successfully reviewed date")
         }

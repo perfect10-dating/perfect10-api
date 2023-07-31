@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema({
 
   // BEGIN SECTION: dating history
   // the group the user is scored with respect to
-  userGroup: {type: ObjectId, required: true},
+  userGroups: [{type: ObjectId, required: true}],
 
   // the user is currently waiting for a room
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
