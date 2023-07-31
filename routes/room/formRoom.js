@@ -116,8 +116,10 @@ const formRoomFunction = (cognitoId) => {
                     isSingleSided: isOneSided,
                     sideOne: dates,
                     sideOneIdentity: choice,
+                    sideOneScores: {min: otherGroupStdevData.minScore, max: otherGroupStdevData.maxScore},
                     sideTwo: competitors,
                     sideTwoIdentity: identity,
+                    sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
                 })
 
                 console.log("Saving room")

@@ -81,12 +81,14 @@ async function replaceUserInRoom(userObject) {
             let {room, onSideTwo} = await findRoomsWithUsers(userObject, {})
 
             // set what the person is looking for and what their identity is
-            let targetIdentity = onSideTwo ? room.sideTwoIdentity : sideOneIdentity
-            let targetLookingFor = onSideTwo ? room.sideOneIdentity : sideTwoIdentity
+            let targetIdentity = onSideTwo ? room.sideTwoIdentity : room.sideOneIdentity
+            let targetLookingFor = onSideTwo ? room.sideOneIdentity : room.sideTwoIdentity
 
             // depending on what side we're on, find the user and remove them from that side
             let workingArray = []
+            let scores
             if (onSideTwo) {
+                scores = room.sideTwoScores
                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
                     if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideTwo[userIndex])
@@ -95,6 +97,7 @@ async function replaceUserInRoom(userObject) {
                 room.sideTwo = workingArray
             }
             else {
+                scores = room.sideTwoScores
                 for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
                     if (room.sideOne[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideOne[userIndex])
@@ -105,8 +108,11 @@ async function replaceUserInRoom(userObject) {
 
             // temporarily save the room -- the original user will have left even if we have an error later
             await room.save()
+
             // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
-            let newUser = await UserModel.findOne(roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity))
+            let newUser = await UserModel.findOne(
+                roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity, scores.min, scores.max)
+            )
                 .select(["_id", "waitingForRoom", "currentRoom"])
                 .exec()
 

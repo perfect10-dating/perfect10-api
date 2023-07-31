@@ -18,11 +18,15 @@ const RoomSchema = new mongoose.Schema({
   sideOne: [{type: ObjectId, ref: 'user', required: true}],
   // the identity of the first side
   sideOneIdentity: String,
+  // the score range for Side 1
+  sideOneScores: {min: Number, max: Number},
 
   // the second side of the room (empty if single-sided)
   sideTwo: [{type: ObjectId, ref: 'user', required: true}],
   // the identity of the second side
   sideTwoIdentity: String,
+  // the score range for Side 2
+  sideTwoScores: {min: Number, max: Number},
 
 }, {timestamps: true})
 
