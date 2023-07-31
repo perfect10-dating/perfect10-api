@@ -1,4 +1,4 @@
-function roomSelectionCriteria(user, choice, identity) {
+function roomSelectionCriteria(user, choice, identity, minScore, maxScore) {
     return ({
         // not the same _id
         _id: {$ne: user._id},
@@ -16,6 +16,8 @@ function roomSelectionCriteria(user, choice, identity) {
         // they are also less or equally selective than the user
         "ageRange.max": {$gte: user.ageRange.max},
         "ageRange.min": {$lte: user.ageRange.min},
+        // make sure that they are within the score range for the room
+        roomScore: {$and: [{$gte: minScore}, {$lte: maxScore}]},
 
         location: {
             $near: {
