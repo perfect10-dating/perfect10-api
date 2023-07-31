@@ -13,7 +13,18 @@ module.exports = (router) => {
                 return res.status(400).json("Please include all required fields of this request")
             }
 
-            let user = await UserModel.findOne({cognitoId}).populate("lockingDate").exec()
+            let user = await UserModel.findOne({cognitoId}).populate({
+                path: "lockingDate",
+                populate: [{
+                    path: "setupResponsibleUser",
+                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroup"],
+                    populate: ["userGroup"]
+                }, {
+                    path: "users",
+                    select: ["_id", "totalScore", "totalDates", "roomScore", "userGroup"],
+                    populate: ["userGroup"]
+                }]
+            }).exec()
             if (!lockingDate) {
                 return res.status(400).json("You're attempting to review a nonexistent date")
             }
@@ -34,14 +45,9 @@ module.exports = (router) => {
             // create a new date review
             let dateReview = new DateReviewModel({
                 reviewer: user._id,
-                reviewee: otherUser,
+                reviewee: otherUser._id,
                 dateObject: user.lockingDate,
-                intelligent,
-                trustworthy,
-                attractive,
-                pleasant,
-                satisfied,
-                secondDate
+                intelligent, trustworthy, attractive, pleasant, satisfied, secondDate
             })
 
             // save the review
@@ -56,8 +62,18 @@ module.exports = (router) => {
             user.waitingForRoom = true
             await user.save()
 
-            // TODO -- edit the other person's score based on your review
-            // will probably subtract 5 from the final score to create top/bottom bounds
+            // edit the other person's score based on your review
+            let {totalScore, totalDates, roomScore} = generateScore(
+                otherUser.totalScore,
+                otherUser.totalDates,
+                intelligent, trustworthy, attractive, pleasant, satisfied, secondDate
+            )
+
+            otherUser.totalScore = totalScore
+            otherUser.totalDates = totalDates
+            otherUser.roomScore = roomScore
+
+            let otherUserGroup = otherUser.
 
             return res.status(200).json("Successfully reviewed date")
         }

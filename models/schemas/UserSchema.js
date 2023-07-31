@@ -67,6 +67,8 @@ const UserSchema = new mongoose.Schema({
   entryQueueSkipped: {type: Boolean, required: true, default: false},
 
   totalScore: {type: Number, required: true, default: 0},
+  // the number of dates this person has had
+  totalDates: {type: Number, required: true, default: 0},
   // this will be rescored based on total score and adjustments
   roomScore: {type: Number, required: true, default: 0},
   // whether this is the first room someone is entering
