@@ -11,7 +11,8 @@ system and in the room matchmaker
 3. ~~Propose setup~~
 4. ~~Accept / Record setup between two users in room~~
 5. ~~Review date / edit user score / release user~~
-6. ^ edit user score when reviewing date
+6. ~~^ edit user score when reviewing date~~
+7. ^ some way to indicate no-shows
 6. ~~Reject date~~
 7. ~~View Proposed Dates~~
 
@@ -19,19 +20,14 @@ system and in the room matchmaker
 1. Join entry queue
 2. Gain priority in entry queue
 
-## Global
-1. Display potential room options (i.e., if you are a man seeking bio women,
-trans women, and non-binary people, it offers you 3 room options, and
-shows you how many people in each of those groups are seeking men)
-
 ## userGroup
 1. ~~Generate new group (utility function)~~
 2. ~~find closest group (utility function)~~
 
 ## Room
 1. ~~Form room from available users~~
-2. ^ for above: indicate users are not waiting
-3. ^ for above: build in the ranking matchmaker
+2. ~~^ for above: indicate users are not waiting~~
+3. ~~^ for above: build in the ranking matchmaker~~
 2. ~~Replace user in room (utility function)~~
 3. ~~Display information required for a room interface~~
 
