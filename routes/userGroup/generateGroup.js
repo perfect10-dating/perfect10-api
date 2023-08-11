@@ -11,7 +11,7 @@ function generateGroup(identity, lookingFor, age, location, isBeginner) {
             let minAge = 18
             let maxAge = 22
             // keeps moving the range up until it straddles the user
-            while (maxAge < user.age) {
+            while (maxAge < age) {
                 minAge += 5
                 maxAge += 5
             }
