@@ -34,6 +34,8 @@ const UserSchema = new mongoose.Schema({
       required: true
     },
   },
+
+  photoLinks: [requiredString],
   // END SECTION: personally identifiable information
 
   // BEGIN SECTION: dating preferences
