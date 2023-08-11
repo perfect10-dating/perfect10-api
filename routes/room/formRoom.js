@@ -25,6 +25,11 @@ const formRoomFunction = (cognitoId) => {
                     return reject("User is unsuitable for spawning a new room")
                 }
 
+                // if the user is already in a room, we don't allow them to join a new one
+                if (!!user.currentRoom) {
+                    return reject("User is already in a room")
+                }
+
                 // to simplify things: randomly choose one of the groups this person is interested in
                 let group = user.userGroups[Math.floor(Math.random() * user.userGroups.length)]
                 // and select the choice as what that group is looking for

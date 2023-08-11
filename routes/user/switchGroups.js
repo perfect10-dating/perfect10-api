@@ -26,6 +26,7 @@ module.exports = (router) => {
 
             user.temporarilyLocked = true
             user.unlockTime = newTime
+            user.currentRoom = null
 
             await user.save()
             return res.status(200).json("User is now unlocked")
