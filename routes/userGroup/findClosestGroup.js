@@ -11,8 +11,8 @@ function findClosestGroup(identity, lookingFor, age, coordinates) {
             let group = await UserGroupModel.findOne({
                 gender: identity,
                 lookingFor,
-                minAge: {$gte: age},
-                maxAge: {$lte: age},
+                minAge: {$lte: age},
+                maxAge: {$gte: age},
                 location: {
                     $near: {
                         // convert distance in miles to meters, measure only radially
