@@ -14,6 +14,7 @@ const formRoomFunction = (cognitoId) => {
                 select: "lookingFor"
             }).exec()
             if (!user) {
+                console.error("FORM-ROOM: Unable to find user with cognitoId")
                 return reject("Unable to find a user with this ID")
             }
 
@@ -29,17 +30,22 @@ const formRoomFunction = (cognitoId) => {
                 // and select the choice as what that group is looking for
                 let choice = group.lookingFor[0]
 
+                console.log(`FORM-ROOM: Group identity selection complete: a room of ${group.gender} and ${choice}`)
+
                 let isOneSided = false
                 let otherSideGroup
                 // if the room is one-sided, set the other side's group to be the same group
                 if (choice + "" === user.identity + "") {
                     isOneSided = true
                     otherSideGroup = group
+                    console.log("FORM-ROOM: one-sided room")
                 }
                 // otherwise, find a relevant group for the other side
                 // NOTE -- nearest group is NOT guaranteed. First we search groups above, then below the middle
-                // (this means if there is a group overlapping the middle, we will always find them
+                // (this means if there is a group overlapping the middle, we will always find them)
                 else {
+                    console.log("FORM-ROOM: two-sided room")
+
                     let medianAge = (user.ageRange.max + user.ageRange.min)/2
                     let testAge = medianAge
                     while (!otherSideGroup && (testAge <= user.ageRange.max)) {
@@ -53,6 +59,7 @@ const formRoomFunction = (cognitoId) => {
                     }
 
                     if (!otherSideGroup) {
+                        console.log("FORM-ROOM: unable to find a valid group for the other side")
                         return reject("Unable to find any user groups in this age range.")
                     }
                 }
@@ -60,9 +67,10 @@ const formRoomFunction = (cognitoId) => {
                 let userStdDev = getUserStdev(user, group)
                 let userGroupStdevData = getGroupScoreRange(group, userStdDev, ROOM_SCORE_STDEV_RANGE)
                 let otherGroupStdevData = getGroupScoreRange(group, userStdDev, ROOM_SCORE_STDEV_RANGE)
+                console.log(`FORM-ROOM: user has a stdev score of ${userStdDev}, defining ${userGroupStdevData} for their own\
+                 group and ${otherGroupStdevData} for the other group`)
 
-                console.log((user.maxDistance / 2) * 1609)
-
+                console.log("FORM-ROOM: searching for dates and competitors")
                 let [dates, competitors] = await Promise.all([
                     // find dates near these coordinates
                     // identity and choice are flipped, because we want to find someone who is LOOKING FOR
@@ -87,11 +95,11 @@ const formRoomFunction = (cognitoId) => {
                         .exec(),
                 ])
 
-                console.log(`completed find; ${dates.length} dates and ${competitors.length} competitors`)
+                console.log(`FORM-ROOM: completed find; ${dates.length} dates and ${competitors.length} competitors`)
 
                 if (isOneSided) {
                     if (dates.length < 10) {
-                        console.log("rejecting... 1")
+                        console.errors("FORM-ROOM: rejecting due too few dates for one-sided dating")
                         return reject("Not enough dates for one-sided dating")
                     }
                     else {
@@ -100,7 +108,7 @@ const formRoomFunction = (cognitoId) => {
                 }
                 else {
                     if (dates.length < 10 || competitors.length < 9) {
-                        console.log("rejecting... 2")
+                        console.error("FORM-ROOM: rejecting due to two few dates or competitors for 2-sided dating")
                         return reject("Too few dates or competitors")
                     }
                     else {
@@ -108,7 +116,7 @@ const formRoomFunction = (cognitoId) => {
                     }
                 }
 
-                console.log("finished manipulating arrays")
+                console.log("FORM-ROOM: finished manipulating arrays")
 
                 let room = new RoomModel({
                     spawningUser: user,
@@ -122,7 +130,7 @@ const formRoomFunction = (cognitoId) => {
                     sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
                 })
 
-                console.log("Saving room")
+                console.log("FORM-ROOM: Saving room")
                 // save this new room
                 room = await room.save()
 
@@ -136,6 +144,7 @@ const formRoomFunction = (cognitoId) => {
                     competitors[i].currentRoom = room._id
                 }
 
+                console.log("FORM-ROOM: Saving dates and competitors as no longer waiting for rooms")
                 // save all dates and competitors
                 await Promise.all([dates, competitors].map(userArray => {
                     return Promise.all(userArray.map(indUser => {
@@ -143,6 +152,7 @@ const formRoomFunction = (cognitoId) => {
                     }))
                 }))
 
+                console.log("FORM-ROOM: Dates and competitors saved")
                 console.log({dates, competitors})
 
                 return resolve({
