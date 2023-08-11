@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema({
 
   // BEGIN SECTION: dating history
   // the group the user is scored with respect to
-  userGroups: [{type: ObjectId, required: true}],
+  userGroups: [{type: ObjectId, required: true, ref: 'user-group'}],
 
   // the user is currently waiting for a room
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
@@ -76,7 +76,7 @@ const UserSchema = new mongoose.Schema({
 
   // in cases of switching -- the user must continue to wait (usually a 3-day timeout) before they join the next room
   // this will prevent waitingForRoom going back to "true"
-  temporarilyLocked: {type: Boolean, required: true, default: true},
+  temporarilyLocked: {type: Boolean, required: true, default: false},
   // the time when the user will be unlocked (only relevant if temporarilyLocked is true)
   unlockTime: {type: Date, required: false},
 

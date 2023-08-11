@@ -17,7 +17,7 @@ function roomSelectionCriteria(user, choice, identity, minScore, maxScore) {
         "ageRange.max": {$gte: user.ageRange.max},
         "ageRange.min": {$lte: user.ageRange.min},
         // make sure that they are within the score range for the room
-        roomScore: {$and: [{$gte: minScore}, {$lte: maxScore}]},
+        roomScore: {$gte: minScore, $lte: maxScore},
 
         location: {
             $near: {

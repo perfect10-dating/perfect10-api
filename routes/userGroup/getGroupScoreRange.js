@@ -12,7 +12,9 @@ function getGroupScoreRange(group, stdev_center, STDEV_RANGE) {
 Get the stdev of a user with respect to a group
  */
 function getUserStdev(user, group) {
-    return (user.roomScore - group.averageRoomScore) / group.roomScoreStdDev
+    // protect from numerical issues by setting a minimum standard deviation for room score across a group
+    console.log(user.roomScore, group.averageRoomScore, group.roomScoreStdDev)
+    return (user.roomScore - group.averageRoomScore) / Math.max(group.roomScoreStdDev, 0.01)
 }
 
 module.exports = {getGroupScoreRange, getUserStdev}

@@ -9,9 +9,9 @@ const {getUserStdev, getGroupScoreRange} = require("../userGroup/getGroupScoreRa
 const formRoomFunction = (cognitoId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let user = UserModel.findOne({cognitoId}).populate({
+            let user = await UserModel.findOne({cognitoId}).populate({
                 path: "userGroups",
-                select: "lookingFor"
+                select: ["lookingFor", "roomScore", "averageRoomScore", "roomScoreStdDev"]
             }).exec()
             if (!user) {
                 console.error("FORM-ROOM: Unable to find user with cognitoId")
@@ -28,9 +28,10 @@ const formRoomFunction = (cognitoId) => {
                 // to simplify things: randomly choose one of the groups this person is interested in
                 let group = user.userGroups[Math.floor(Math.random() * user.userGroups.length)]
                 // and select the choice as what that group is looking for
+                console.log(group)
                 let choice = group.lookingFor[0]
 
-                console.log(`FORM-ROOM: Group identity selection complete: a room of ${group.gender} and ${choice}`)
+                console.log(`FORM-ROOM: Group identity selection complete: a room of ${user.identity} and ${choice}`)
 
                 let isOneSided = false
                 let otherSideGroup
@@ -67,8 +68,8 @@ const formRoomFunction = (cognitoId) => {
                 let userStdDev = getUserStdev(user, group)
                 let userGroupStdevData = getGroupScoreRange(group, userStdDev, ROOM_SCORE_STDEV_RANGE)
                 let otherGroupStdevData = getGroupScoreRange(group, userStdDev, ROOM_SCORE_STDEV_RANGE)
-                console.log(`FORM-ROOM: user has a stdev score of ${userStdDev}, defining ${userGroupStdevData} for their own\
-                 group and ${otherGroupStdevData} for the other group`)
+                console.log(`FORM-ROOM: user has a stdev score of ${userStdDev}, defining ${JSON.stringify(userGroupStdevData)} for their own\
+group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 console.log("FORM-ROOM: searching for dates and competitors")
                 let [dates, competitors] = await Promise.all([
@@ -126,7 +127,7 @@ const formRoomFunction = (cognitoId) => {
                     sideOneIdentity: choice,
                     sideOneScores: {min: otherGroupStdevData.minScore, max: otherGroupStdevData.maxScore},
                     sideTwo: competitors,
-                    sideTwoIdentity: identity,
+                    sideTwoIdentity: user.identity,
                     sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
                 })
 
