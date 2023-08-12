@@ -17,12 +17,13 @@ module.exports = (router) => {
                 .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom"])
                 .populate({
                     path: "currentRoom",
+                    select: ["sideOne", "sideOneIdentity", "sideTwo", "sideTwoIdentity"],
                     populate: [{
                         path: "sideOne",
-                        select: ["firstName", "lastName", "identity", "age", "location"]
+                        select: ["_id", "firstName", "identity", "age", "location"]
                     }, {
                         path: "sideTwo",
-                        select: ["firstName", "lastName", "identity", "age", "location"]
+                        select: ["_id", "firstName", "identity", "age", "location"]
                     }]
                 })
                 .lean().exec()
@@ -34,9 +35,64 @@ module.exports = (router) => {
                 return res.status(400).json("User is currently locked and may not see room")
             }
 
-            let {_id} = user
+            if (!user.currentRoom) {
+                return res.status(500).json("User is not in a room")
+            }
 
-            return res.status(200).json(user.currentRoom)
+            let idArray = []
+            for (let userGroup of [user.currentRoom.sideOne, user.currentRoom.sideTwo]) {
+                for (let user of userGroup) {
+                    idArray.push(user._id)
+                }
+            }
+
+            /**
+             * https://stackoverflow.com/questions/49554129/mongoose-find-all-documents-with-array-field-which-is-included-in-another-array
+             *
+             * We find the intersection of the ids and the user arrays for each date
+             * Only allow user arrays with no additional users
+             */
+            let dates = await DateModel.aggregate([
+                {
+                    $addFields: {
+                        matchingElements: { $setIntersection: [ idArray, "$users" ] }
+                    }
+                },
+                {
+                    $redact: {
+                        $cond: {
+                            if: { $eq: [ { $size: "$users" }, { $size: "$matchingElements" } ] },
+                            then: "$$KEEP",
+                            else: "$$PRUNE"
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        matchingElements: 0
+                    }
+                }
+            ])
+
+            // remove setups from outside the group
+            let datesPruned = []
+            for (let date of dates) {
+                // non-setups are valid
+                if (date.users.length === 2) {
+                    datesPruned.push(date)
+                }
+                else {
+                    // setups from within the group are valid
+                    for (let id of idArray) {
+                        if (id + "" === date.setupResponsibleUser + "") {
+                            datesPruned.push(date)
+                            break
+                        }
+                    }
+                }
+            }
+
+            return res.status(200).json({room: user.currentRoom, dates: datesPruned})
         } catch (err) {
             return res.status(500).json(err)
         }
