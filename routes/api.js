@@ -34,6 +34,7 @@ require('./room/formRoom')(router)
 // user
 require('./user/create')(router)
 // require('./user/edit')(router)
+require('./user/get-user')(router)
 require('./user/switchGroups')(router)
 // require('./user/uploadPhotos')(router)
 
