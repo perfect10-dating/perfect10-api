@@ -4,9 +4,9 @@ Views any dates that you or other users proposed
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
-    router.get('/display-room', async (req, res) => {
+    router.get('/display-room/:cognitoId', async (req, res) => {
         try {
-            let {cognitoId} = req.body
+            let {cognitoId} = req.params
 
             if (!cognitoId) {
                 return res.status(400).json("Specify your cognitoId")

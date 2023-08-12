@@ -1,11 +1,13 @@
+const UserModel = require("../../models/UserModel");
 module.exports = (router) => {
-    router.post('/get-user', async (req, res) => {
+    router.get('/get-user/:cognitoId', async (req, res) => {
         // TODO -- do this based on auth
-        let {cognitoId} = req.body
+        let {cognitoId} = req.params
         if (!cognitoId) {
             return res.status(400).json("Not logged in")
         }
 
+        console.log({cognitoId})
         try {
             let user = await UserModel.findOne({cognitoId}).select([
                 "_id", "cognitoId", "phoneNumber", "emailAddress", "firstName", "lastName", "identity", "age", "dateOfBirth",

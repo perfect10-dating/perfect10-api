@@ -28,7 +28,7 @@ require('./date/viewProposedDates')(router)
 // require('./global/displayRoomOptions')(router)
 
 // room
-// require('./room/displayRoom')(router)
+require('./room/displayRoom')(router)
 require('./room/formRoom')(router)
 
 // user
