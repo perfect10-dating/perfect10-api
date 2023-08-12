@@ -4,7 +4,7 @@ Views any dates that you or other users proposed
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
-    router.get('/view-proposed-dates', async (req, res) => {
+    router.get('/display-room', async (req, res) => {
         try {
             let {cognitoId} = req.body
 

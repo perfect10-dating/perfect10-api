@@ -17,7 +17,7 @@ module.exports = (router) => {
             }
 
             user.locationCoords = user.location.coordinates
-            
+
             return res.status(200).json(user)
         }
         catch (err) {
