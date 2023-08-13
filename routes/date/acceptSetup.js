@@ -43,6 +43,7 @@ module.exports = (router) => {
             for (let i = 0; i < date.users.length; i++) {
                 date.users[i].mustReviewDate = true
                 date.users[i].lockingDate = date._id
+                date.users[i].isNew = false
                 promiseArray.push(date.users[i].save())
             }
 
@@ -51,6 +52,7 @@ module.exports = (router) => {
             // swaps the setupResponsibleUser back into the room matchmaker
             await replaceUserInRoom(date.setupResponsibleUser)
             date.setupResponsibleUser.waitingForRoom = true
+            date.setupResponsibleUser.isNew = false
             await date.setupResponsibleUser.save()
 
             return res.status(200).json("Setup accepted")

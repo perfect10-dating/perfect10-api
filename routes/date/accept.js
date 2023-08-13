@@ -42,6 +42,8 @@ module.exports = (router) => {
             for (let i = 0; i < date.users.length; i++) {
                 date.users[i].mustReviewDate = true
                 date.users[i].lockingDate = date._id
+                // also marks them as no longer new
+                date.users[i].isNew = false
                 promiseArray.push(date.users[i].save())
             }
 
