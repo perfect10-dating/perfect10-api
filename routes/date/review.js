@@ -7,9 +7,11 @@ const {removeUserFromRoom} = require("../room/replaceUserInRoom");
 module.exports = (router) => {
     router.post('/review-date', async (req, res) => {
         try {
-            let {cognitoId, intelligent, trustworthy, attractive, pleasant, satisfied, secondDate} = req.body
+            let {cognitoId, wasNoShow, wasCatfish, wasThreatening, intelligent, trustworthy,
+                attractive, pleasant, satisfied, secondDate} = req.body
 
-            if (!cognitoId || !intelligent || !trustworthy || !attractive || !pleasant || !satisfied || !secondDate) {
+            if (!cognitoId || wasNoShow===undefined || wasCatfish===undefined || wasThreatening===undefined ||
+                !intelligent || !trustworthy || !attractive || !pleasant || !satisfied || !secondDate) {
                 return res.status(400).json("Please include all required fields of this request")
             }
 
@@ -47,6 +49,7 @@ module.exports = (router) => {
                 reviewer: user._id,
                 reviewee: otherUser._id,
                 dateObject: user.lockingDate,
+                wasNoShow, wasCatfish, wasThreatening,
                 intelligent, trustworthy, attractive, pleasant, satisfied, secondDate
             })
 
@@ -67,6 +70,7 @@ module.exports = (router) => {
             let {totalScore, totalDates, roomScore} = generateScore(
                 otherUser.totalScore,
                 otherUser.totalDates,
+                wasNoShow, wasCatfish, wasThreatening,
                 intelligent, trustworthy, attractive, pleasant, satisfied, secondDate
             )
 

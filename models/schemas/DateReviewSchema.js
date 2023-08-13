@@ -15,6 +15,14 @@ const DateReviewSchema = new mongoose.Schema({
   dateObject: {type: ObjectId, ref: 'date', required: true, index: true},
 
   // the review itself
+  // Did your date show up?
+  wasNoShow: {type: Boolean, required: true, default: false},
+
+  // Did your date look like their photos?
+  wasCatfish: {type: Boolean, required: true, default: false},
+
+  // Did your date make you feel unsafe?
+  wasThreatening: {type: Boolean, required: true, default: false},
 
   // "How intelligent did you find your date? (1-10)"
   intelligent: {type: Number, required: true},
