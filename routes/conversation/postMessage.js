@@ -44,7 +44,7 @@ module.exports = (router) => {
                 isImage,
                 imageUrl,
                 conversation: conversation._id,
-                user: user._id
+                sender: user._id
             })
 
             await message.save()

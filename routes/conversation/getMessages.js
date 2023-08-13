@@ -17,27 +17,9 @@ module.exports = (router) => {
           }
 
           // use the same code as in displayRoom
-          let conversations = await ConversationModel.aggregate([
-              {
-                  $addFields: {
-                      matchingElements: { $setIntersection: [ [user._id, otherUserId], "$users" ] }
-                  }
-              },
-              {
-                  $redact: {
-                      $cond: {
-                          if: { $eq: [ { $size: "$users" }, { $size: "$matchingElements" } ] },
-                          then: "$$KEEP",
-                          else: "$$PRUNE"
-                      }
-                  }
-              },
-              {
-                  $project: {
-                      matchingElements: 0
-                  }
-              }
-          ])
+          let conversations = await ConversationModel.find({
+              users: {$all: [user._id, otherUserId]},
+          }).select("_id").lean().exec()
 
           if (conversations.length === 0) {
               console.log("GET-MESSAGES: no conversations found between these two users")
@@ -46,9 +28,11 @@ module.exports = (router) => {
           }
 
           else {
+              console.log("GET-MESSAGES: at least one conversation found")
               let workingConversation = conversations[0]
 
               let messages = await MessageModel.find({conversation: workingConversation._id}).lean().exec()
+              console.log(messages)
 
               // sort the messages, with newest on the bottom
               let sortedMessages = messages.sort((message1, message2) => {

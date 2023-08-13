@@ -10,7 +10,7 @@ const MessageSchema = new mongoose.Schema({
     isImage: {type: Boolean},
     imageUrl: {type: String},
     conversation: {type: ObjectId, ref: 'conversation', required: true, index: true},
-    sender: {type: ObjectId, red: 'user'}
+    sender: {type: ObjectId, red: 'user', required: true}
 
 }, {timestamps: true})
 
