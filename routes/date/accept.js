@@ -41,6 +41,7 @@ module.exports = (router) => {
             for (let i = 0; i < date.users.length; i++) {
                 date.users[i].mustReviewDate = true
                 date.users[i].lockingDate = date._id
+                promiseArray.push(date.users[i].save())
             }
 
             await Promise.all(promiseArray)
