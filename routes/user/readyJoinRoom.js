@@ -1,9 +1,9 @@
 const UserModel = require("../../models/UserModel");
 module.exports = (router) => {
     /*
-    The user attempts to unlock themselves from temporarilyLocked
+    The user marks themselves as being ready to join a new room
      */
-    router.post('/unlock', async (req, res) => {
+    router.post('/ready-join-room', async (req, res) => {
         let {cognitoId} = req.body
         if (!cognitoId) {
             return res.status(400).json("You must be logged in to access this route")
@@ -17,13 +17,15 @@ module.exports = (router) => {
             }
 
             // check to see if unlockTime has passed. If so, we can unlock the user
-            if (user.temporarilyLocked && (!user.unlockTime || Date.now() > (new Date(user.unlockTime)).getTime())) {
-                user.temporarilyLocked = false
-                await user.save()
-                return res.status(200).json("Success")
+            if (user.temporarilyLocked || user.mustReviewDate) {
+                console.error("READY-JOIN-ROOM: This user can't join a room yet")
+                return res.status(200).json("This user can't join a room yet")
             }
             else {
-                return res.status(400).json("This user is not yet unlockable")
+                user.waitingForRoom = true
+                await user.save()
+
+                return res.status(200).json("User may now join a room")
             }
         }
         catch (err) {
