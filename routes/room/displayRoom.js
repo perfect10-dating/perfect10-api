@@ -3,6 +3,7 @@ Views any dates that you or other users proposed
  */
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
+const {userInDate} = require("../date/userInDate");
 module.exports = (router) => {
     router.get('/display-room/:cognitoId', async (req, res) => {
         try {
@@ -99,6 +100,7 @@ module.exports = (router) => {
 
             return res.status(200).json({room: user.currentRoom, dates: datesPruned})
         } catch (err) {
+            console.error(err)
             return res.status(500).json(err)
         }
     })

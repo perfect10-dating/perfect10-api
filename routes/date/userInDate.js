@@ -13,3 +13,5 @@ function userInDate(date, userId) {
         }
     }
 }
+
+module.exports = {userInDate}
