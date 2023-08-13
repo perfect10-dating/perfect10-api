@@ -28,6 +28,7 @@ module.exports = (router) => {
 
             // find the date
             let date = await DateModel.findOne({_id: dateId}).populate(["users"]).exec()
+
             if (!userInDate(date, user._id)) {
                 return res.status(400).json("You may not attempt to accept the date of two unknown users")
             }

@@ -32,7 +32,6 @@ module.exports = (router) => {
               let workingConversation = conversations[0]
 
               let messages = await MessageModel.find({conversation: workingConversation._id}).lean().exec()
-              console.log(messages)
 
               // sort the messages, with newest on the bottom
               let sortedMessages = messages.sort((message1, message2) => {
