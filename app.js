@@ -18,7 +18,7 @@ const executor = async () => {
     var server = require('./server')
     server.listen(PORT, () => console.log('\nRunning Perfect10 API server on port ' + PORT))
     
-    process.on('SIGINT', () => connection.close(() => process.exit(0)))
+    process.on('SIGINT', () => connection.close().then(() => process.exit(0)))
   }
   catch (err) {
     console.error(err)

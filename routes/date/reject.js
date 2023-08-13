@@ -1,6 +1,6 @@
 /*
 Rejects a proposed date (TODO -- make this based on auth tokens)
-Either party may reject a date until both parties agree to it
+Either party may reject a date until both parties agree to it (so you can cancel a date you proposed)
  */
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");

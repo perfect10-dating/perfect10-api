@@ -77,6 +77,11 @@ module.exports = (router) => {
             // remove setups from outside the group
             let datesPruned = []
             for (let date of dates) {
+                // if the searching user is not in the date, and the date is not accepted, do not display it
+                if (!userInDate(date, user._id) && !date.isAccepted) {
+                    continue
+                }
+
                 // non-setups are valid
                 if (date.users.length === 2) {
                     datesPruned.push(date)
