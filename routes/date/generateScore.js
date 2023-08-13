@@ -28,3 +28,5 @@ function generateScore(totalScore, totalDates, intelligent, trustworthy, attract
 
     return {totalScore, totalDates, roomScore}
 }
+
+module.exports = {generateScore}

@@ -14,7 +14,11 @@ is no longer suitable for a user)
 async function findRoomsWithUsers(userObject, additionalParameters) {
     return new Promise(async (resolve, reject) => {
         try {
-            let room = userObject.currentRoom.populate()
+            let room = await RoomModel.findOne({_id: userObject.currentRoom}).exec()
+            if (!room) {
+                console.error("The user is not in a room")
+                reject("No room")
+            }
             let onSideTwo = false
 
             // scan side 2 to see if the user is on that side
@@ -25,9 +29,9 @@ async function findRoomsWithUsers(userObject, additionalParameters) {
             }
 
             if (onSideTwo) {
-                resolve ({room: onSideTwo, onSideTwo: true})
+                resolve ({room, onSideTwo: true})
             }
-            else resolve ({room: onSideOne, onSideTwo: false})
+            else resolve ({room, onSideTwo: false})
         }
         catch (err) {
             reject(err)
@@ -62,7 +66,7 @@ async function removeUserFromRoom(userObject) {
                 room.sideOne = workingArray
             }
 
-            await room.save().exec()
+            await room.save()
             resolve("Removing user from room successful")
         }
         catch(err) {

@@ -4,6 +4,7 @@ This route allows the user to write a date review for another user
 const UserModel = require("../../models/UserModel");
 const DateReviewModel = require("../../models/DateReviewModel");
 const {removeUserFromRoom} = require("../room/replaceUserInRoom");
+const {generateScore} = require("./generateScore");
 module.exports = (router) => {
     router.post('/review-date', async (req, res) => {
         try {
@@ -11,7 +12,8 @@ module.exports = (router) => {
                 attractive, pleasant, satisfied, secondDate} = req.body
 
             if (!cognitoId || wasNoShow===undefined || wasCatfish===undefined || wasThreatening===undefined ||
-                !intelligent || !trustworthy || !attractive || !pleasant || !satisfied || !secondDate) {
+                !intelligent || !trustworthy || !attractive || !pleasant || !satisfied ||
+                secondDate===undefined) {
                 return res.status(400).json("Please include all required fields of this request")
             }
 
@@ -33,7 +35,7 @@ module.exports = (router) => {
                     populate: ["userGroups"]
                 }]
             }).exec()
-            if (!lockingDate) {
+            if (!user.lockingDate) {
                 return res.status(400).json("You're attempting to review a nonexistent date")
             }
 
@@ -61,6 +63,7 @@ module.exports = (router) => {
 
             // save the review
             await dateReview.save()
+            console.log("DATE-REVIEW: Saved new review")
 
             // release yourself
             user.mustReviewDate = false
@@ -71,6 +74,7 @@ module.exports = (router) => {
             user.currentRoom = null
             user.waitingForRoom = true
             await user.save()
+            console.log("DATE-REVIEW: Swapped reviewing user out of room")
 
             // edit the other person's score based on your review
             let {totalScore, totalDates, roomScore} = generateScore(
@@ -86,6 +90,7 @@ module.exports = (router) => {
 
             // save the new score
             await otherUser.save()
+            console.log("DATE-REVIEW: Edited other user score")
 
             // find the user group the other user belongs to
             let otherUserGroups = otherUser.userGroups
@@ -103,6 +108,7 @@ module.exports = (router) => {
             }
 
             await Promise.all(otherUserGroups.map(group => group.save()))
+            console.log("DATE-REVIEW: Modified user group information")
 
             return res.status(200).json("Successfully reviewed date")
         }
