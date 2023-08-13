@@ -13,6 +13,10 @@ router.use(async function (req, res, next) {
 // END ROUTE AUTHENTICATION
 
 // BEGIN CUSTOM ROUTE REGISTRATION
+// conversation routs
+require('./conversation/getMessages')(router)
+require('./conversation/postMessage')(router)
+
 // date routes
 require('./date/accept')(router)
 require('./date/acceptSetup')(router)
