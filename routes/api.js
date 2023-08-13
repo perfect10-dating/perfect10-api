@@ -41,6 +41,7 @@ require('./user/create')(router)
 // require('./user/edit')(router)
 require('./user/get-user')(router)
 require('./user/switchGroups')(router)
+require('./user/unlock')(router)
 // require('./user/uploadPhotos')(router)
 
 // END CUSTOM ROUTE REGISTRATION
