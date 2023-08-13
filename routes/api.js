@@ -22,6 +22,7 @@ require('./date/accept')(router)
 require('./date/acceptSetup')(router)
 require('./date/propose')(router)
 require('./date/proposeSetup')(router)
+require('./date/reject')(router)
 require('./date/review')(router)
 require('./date/viewProposedDates')(router)
 // entry routes

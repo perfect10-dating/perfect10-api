@@ -7,7 +7,12 @@ function userInDate(date, userId) {
     if (userId+"" === date.setupResponsibleUser+"") {
         return true
     }
-    for (let userIdInArr of date.users) {
+    for (let userInArr of date.users) {
+        let userIdInArr = userInArr._id
+        if (!userIdInArr) {
+            userIdInArr = userInArr
+        }
+        // case -- the id is a string
         if (userIdInArr+"" === userId+"") {
             return true
         }

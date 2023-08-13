@@ -5,6 +5,7 @@ Either party may reject a date until both parties agree to it
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {replaceUserInRoom} = require("../room/replaceUserInRoom");
+const {userInDate} = require("./userInDate");
 module.exports = (router) => {
     router.post('/accept-setup', async (req, res) => {
         try {
@@ -28,17 +29,8 @@ module.exports = (router) => {
 
             // find the date
             let date = await DateModel.findOne({_id: dateId}).populate(["users", "setupResponsibleUser"]).exec()
-            let userInDate = false
-            for (let i = 0; i < date.users.length; i++) {
-                if (date.users[i] + "" === _id + "") {
-                    userInDate = true
-                }
-            }
-            if (date.isSetup && date.setupResponsibleUser._id+"" === _id+"") {
-                userInDate = true
-            }
 
-            if (!userInDate) {
+            if (!userInDate(date, user._id)) {
                 return res.status(400).json("You may not attempt to accept the date of two unknown users")
             }
 
