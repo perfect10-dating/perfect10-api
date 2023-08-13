@@ -15,6 +15,12 @@ module.exports = (router) => {
                 return res.status(400).json("Please include all required fields of this request")
             }
 
+            for (let field of [intelligent, trustworthy, attractive, pleasant, satisfied]) {
+                if (field < 1 || field > 10) {
+                    return res.status(400).json("Numerical fields must be between 1 and 10")
+                }
+            }
+
             let user = await UserModel.findOne({cognitoId}).populate({
                 path: "lockingDate",
                 populate: [{
