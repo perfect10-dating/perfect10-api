@@ -69,10 +69,9 @@ module.exports = (router) => {
             user.mustReviewDate = false
             await user.save()
 
-            // swap yourself out of your old room and into a new room
+            // swap yourself out of your old room and allow yourself to choose to join a new one
             await removeUserFromRoom(user)
             user.currentRoom = null
-            user.waitingForRoom = true
             await user.save()
             console.log("DATE-REVIEW: Swapped reviewing user out of room")
 
