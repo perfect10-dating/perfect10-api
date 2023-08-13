@@ -13,7 +13,16 @@ module.exports = (router) => {
                 "_id", "cognitoId", "phoneNumber", "emailAddress", "firstName", "lastName", "identity", "age", "dateOfBirth",
                 "location", "photoLinks", "lookingFor", "shortTerm", "ageRange", "waitingForRoom", "currentRoom",
                 "temporarilyLocked", "unlockTime", "mustReviewDate", "lockingDate"
-            ]).populate("lockingDate").lean().exec()
+            ]).populate({
+                path: "lockingDate",
+                populate: [{
+                    path: "users",
+                    select: ["_id", "firstName", "identity", "age", "location"]
+                }, {
+                    path: "setupResponsibleUser",
+                    select: ["_id", "firstName", "identity", "age", "location"]
+                }]
+            }).lean().exec()
             if (!user) {
                 return res.status(404).json("User not found")
             }
