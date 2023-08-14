@@ -5,11 +5,13 @@ const {generateGroup} = require("../userGroup/generateGroup");
 module.exports = (router) => {
     router.post('/create-user', async (req, res) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
-        let {cognitoId, phoneNumber, firstName, identity, birthDate, longitude, latitude} = req.body
+        let {cognitoId, phoneNumber, firstName, identity, birthDate, longitude, latitude, lookingFor} = req.body
 
         console.log(req.body)
 
-        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate || !longitude || !latitude) {
+        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate || !longitude || !latitude ||
+            !lookingFor
+        ) {
             console.log("CREATE-USER: Rejecting because of unspecified fields")
             return res.status(400).json("Make sure you specify all required fields")
         }
@@ -62,7 +64,7 @@ module.exports = (router) => {
                 age: age,
                 ageRange,
 
-                // lookingFor: req.body.lookingFor,
+                lookingFor: req.body.lookingFor,
                 // shortTerm: !!req.body.shortTerm,
                 userGroups: groups,
             })

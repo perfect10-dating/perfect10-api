@@ -9,6 +9,9 @@ export const handler = async (event) => {
       identity: event.request.userAttributes.gender,
       firstName: event.request.userAttributes.given_name,
       phoneNumber: event.request.userAttributes.phone_number,
+      longitude: event.request.userAttributes["custom:longitude"],
+      latitude: event.request.userAttributes["custom:latitude"],
+      lookingFor: event.request[custom:lookingFor].split(":"),
     })
   };
   await fetch("http://perfect10.us-east-1.elasticbeanstalk.com/api/create-user", requestOptions)
