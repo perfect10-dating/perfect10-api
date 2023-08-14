@@ -57,7 +57,8 @@ module.exports = (router) => {
 
             return res.status(200).json("Setup accepted")
         } catch (err) {
-            return res.status(500).json(err)
+            console.error(err)
+            return res.status(500).json("An error occurred while you were accepting this setup")
         }
     })
 }

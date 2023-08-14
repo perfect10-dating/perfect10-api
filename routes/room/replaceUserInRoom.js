@@ -14,7 +14,9 @@ is no longer suitable for a user)
 async function findRoomsWithUsers(userObject, additionalParameters) {
     return new Promise(async (resolve, reject) => {
         try {
-            let room = await RoomModel.findOne({_id: userObject.currentRoom}).exec()
+            let room = await RoomModel.findOne({_id: userObject.currentRoom}).populate([{
+                path: "spawningUser",
+            }]).exec()
             if (!room) {
                 console.error("The user is not in a room")
                 reject("No room")
