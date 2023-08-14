@@ -1,10 +1,10 @@
-import { PreSignUpTriggerHandler } from "aws-lambda";
-import { ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
+// import { ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
+// import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 
-const cognitoClient = new CognitoIdentityProviderClient({})
+// const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event) => {
+/*
     const {
         userPoolId,
         request: { userAttributes }
@@ -21,6 +21,7 @@ export const handler = async (event) => {
     if (Users && Users.length > 0) {
         throw Error("Phone Number already in use");
     }
+    */
 
     event.response.autoVerifyPhone = true
     event.response.autoConfirmUser = true
