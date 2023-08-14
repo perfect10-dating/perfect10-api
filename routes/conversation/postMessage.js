@@ -8,7 +8,9 @@ const MessageModel = require("../../models/MessageModel");
  */
 module.exports = (router) => {
     router.post('/post-message', async (req, res) => {
-        let {cognitoId, otherUserId, conversationId, text, isImage, imageUrl} = req.body
+        let cognitoId = res.locals.user
+
+        let {otherUserId, conversationId, text, isImage, imageUrl} = req.body
         if (!cognitoId || ((!conversationId || conversationId === "") && !otherUserId)) {
             return res.status(400).json("You must be both logged in and specify a conversation or other user")
         }

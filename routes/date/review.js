@@ -8,7 +8,8 @@ const {generateScore} = require("./generateScore");
 module.exports = (router) => {
     router.post('/review-date', async (req, res) => {
         try {
-            let {cognitoId, wasNoShow, wasCatfish, wasThreatening, intelligent, trustworthy,
+            let cognitoId = res.locals.user
+            let {wasNoShow, wasCatfish, wasThreatening, intelligent, trustworthy,
                 attractive, pleasant, satisfied, secondDate} = req.body
 
             if (!cognitoId || wasNoShow===undefined || wasCatfish===undefined || wasThreatening===undefined ||

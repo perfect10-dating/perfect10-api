@@ -5,9 +5,9 @@ const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {userInDate} = require("../date/userInDate");
 module.exports = (router) => {
-    router.get('/display-room/:cognitoId', async (req, res) => {
+    router.get('/display-room', async (req, res) => {
         try {
-            let {cognitoId} = req.params
+            let cognitoId = res.locals.user
 
             if (!cognitoId) {
                 return res.status(400).json("Specify your cognitoId")

@@ -9,7 +9,8 @@ const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
     router.post('/propose-setup', async (req, res) => {
         try {
-            let {cognitoId, otherUserId, time} = req.body
+            let cognitoId = res.locals.user
+            let {otherUserId, time} = req.body
 
             if (!cognitoId || !otherUserId || !time) {
                 return res.status(400).json("Specify your cognitoId and the other user's ID")

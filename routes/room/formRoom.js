@@ -177,7 +177,9 @@ module.exports = (router) => {
     // calls the formRoom function with a particular user id, immediately calculating to see if they can get a room
     router.post('/form-room', async (req, res) => {
         try {
-            await formRoomFunction(req.body.cognitoId)
+            let cognitoId = res.locals.user
+
+            await formRoomFunction(cognitoId)
             return res.status(200).json("Formed a new room")
         } catch (err) {
             return res.status(500).json(err)

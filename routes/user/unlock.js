@@ -4,7 +4,8 @@ module.exports = (router) => {
     The user attempts to unlock themselves from temporarilyLocked
      */
     router.post('/unlock', async (req, res) => {
-        let {cognitoId} = req.body
+        let cognitoId = res.locals.user
+
         if (!cognitoId) {
             return res.status(400).json("You must be logged in to access this route")
         }

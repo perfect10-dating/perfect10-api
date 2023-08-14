@@ -4,7 +4,8 @@ module.exports = (router) => {
     The user marks themselves as being ready to join a new room
      */
     router.post('/ready-join-room', async (req, res) => {
-        let {cognitoId} = req.body
+        let cognitoId = res.locals.user
+
         if (!cognitoId) {
             return res.status(400).json("You must be logged in to access this route")
         }

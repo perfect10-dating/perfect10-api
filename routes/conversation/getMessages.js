@@ -5,7 +5,8 @@ const MessageModel = require("../../models/MessageModel");
 
 module.exports = (router) => {
     router.get('/get-messages/:ownCognitoId/:otherUserId', async (req, res) => {
-      let {ownCognitoId, otherUserId} = req.params
+        let ownCognitoId = res.locals.user
+      let {otherUserId} = req.params
       if (!ownCognitoId || !otherUserId) {
           return res.status(400).json("You must be both logged in and specify another user")
       }
