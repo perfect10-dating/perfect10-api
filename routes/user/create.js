@@ -7,13 +7,16 @@ module.exports = (router) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
         let {cognitoId, phoneNumber, firstName, identity, birthDate} = req.body
 
+        console.log(req.body)
+
         if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate) {
+            console.log("CREATE-USER: Rejecting because of unspecified fields")
             return res.status(400).json("Make sure you specify all required fields")
         }
 
         // TODO -- location
         let unixBirthDate = (new Date(birthDate)).getTime()
-        let age = Math.floor((Date.now() - (unixBirthDate) / (1000 * 60 * 60 * 24 * 365)))
+        let age = Math.floor((Date.now() - unixBirthDate) / (1000 * 60 * 60 * 24 * 365))
         // create a placeholder age range that seems reasonable
         let ageRange = {
             min: Math.max(18, age-3),
@@ -21,6 +24,7 @@ module.exports = (router) => {
         }
 
         if (age < 18 || age > 150) {
+            console.log(`CREATE-USER: rejecting because of out-of-bounds age ${age}`)
             return res.status(400).json("Age is too small or too large")
         }
 
@@ -42,6 +46,7 @@ module.exports = (router) => {
             // save the groups
             await Promise.all(groups.map(group => group.save()))
 
+            console.log("CREATE-USER: Generating the user object")
             let user = new UserModel({
                 // explicit fields
                 cognitoId: req.body.cognitoId,
@@ -60,6 +65,7 @@ module.exports = (router) => {
                 userGroups: groups,
             })
 
+            console.log("CREATE-USER: Saving the user object")
             let savedUser = await user.save()
             return res.status(200).json(savedUser._id)
         }
