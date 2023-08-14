@@ -1,14 +1,80 @@
 const router = require('express').Router()
 const CognitoExpress = require('cognito-express')
+const { getCognitoUser } = require('./utils/cognito')
+const CognitoRefreshToken = require('amazon-cognito-identity-js').CognitoRefreshToken;
+// END IMPORT SECTION
 
-// TODO -- do we need route auth?
+// BEGIN COGNITO
+// configure cognito-express
+const cognitoExpress = new CognitoExpress({
+  region: 'us-east-1',
+  cognitoUserPoolId: 'us-east-1_dgaKxRACk',
+  tokenUse: 'id', // access or id
+  tokenExpiration: 1000 * 60 * 60 * 24 // one day
+})
+// END COGNITO
+
+// BEGIN ROUTE AUTHENTICATION
+// specify routes that permit unauthenticated access
+const UNAUTHENTICATED_ROUTES = [
+    '/create-user'
+]
+
+const ADMIN_ROUTES = []
+
 // auth wall
 router.use(async function (req, res, next) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
   }
-  
-  return next()
+
+  // we will authenticate even on unauthenticated routes if id-token is provided
+  let idToken = req.headers['id-token']
+
+  for (let route of UNAUTHENTICATED_ROUTES) {
+    if (req.path.startsWith(route) && !idToken) {
+      return next()
+    }
+  }
+
+  if (!idToken) {
+    let phoneNumber = req.headers['phoneNumber']
+    let refreshToken = req.headers['refresh-token']
+    if (!phoneNumber || !refreshToken) {
+      return res.status(400).json("If you don't specify an idToken, you must specify both an phoneNumber and refreshToken")
+    }
+    let cognitoRefreshToken = new CognitoRefreshToken({ RefreshToken: refreshToken })
+    idToken = await new Promise((resolve) => {
+      getCognitoUser(phoneNumber).refreshSession(cognitoRefreshToken, (err, session) => {
+        err ? resolve() : resolve(session.getIdToken().getJwtToken())
+      })
+    })
+
+    if (!idToken) {
+      return res.status(500).json("Could not refresh the session with this token. Did it expire?")
+    }
+  }
+
+  cognitoExpress.validate(idToken, function (err, cognitoUser) {
+    if (err) {
+      return res.status(401).send(err)
+    }
+
+    for (let route of ADMIN_ROUTES) {
+      if (req.path.startsWith(route)) {
+        let isAdmin = cognitoUser['custom:role'] === 'admin'
+        if (isAdmin) {
+          break
+        } else {
+          return res.sendStatus(401)
+        }
+      }
+    }
+
+    res.locals.user = cognitoUser
+    console.log("AUTH SUCCESSFUL")
+    next()
+  })
 })
 // END ROUTE AUTHENTICATION
 
