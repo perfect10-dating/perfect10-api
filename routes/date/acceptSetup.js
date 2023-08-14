@@ -9,7 +9,7 @@ const {userInDate} = require("./userInDate");
 module.exports = (router) => {
     router.post('/accept-setup', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
             let {dateId} = req.body
 
             if (!cognitoId || !dateId) {

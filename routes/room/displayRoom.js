@@ -7,7 +7,7 @@ const {userInDate} = require("../date/userInDate");
 module.exports = (router) => {
     router.get('/display-room', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
 
             if (!cognitoId) {
                 return res.status(400).json("Specify your cognitoId")

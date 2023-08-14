@@ -9,7 +9,7 @@ const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
     router.post('/propose-date', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
             let {otherUserId, time} = req.body
 
             if (!cognitoId || !otherUserId || !time) {

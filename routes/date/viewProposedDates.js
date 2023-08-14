@@ -6,7 +6,7 @@ const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
     router.get('/view-proposed-dates', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
 
             if (!cognitoId) {
                 return res.status(400).json("Specify your cognitoId")

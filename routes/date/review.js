@@ -8,7 +8,7 @@ const {generateScore} = require("./generateScore");
 module.exports = (router) => {
     router.post('/review-date', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
             let {wasNoShow, wasCatfish, wasThreatening, intelligent, trustworthy,
                 attractive, pleasant, satisfied, secondDate} = req.body
 

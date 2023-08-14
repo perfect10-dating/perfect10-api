@@ -9,7 +9,7 @@ module.exports = (router) => {
      */
     router.post('/switch-groups-delayed', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
 
             if (!cognitoId) {
                 return res.status(400).json("You must be authenticated")

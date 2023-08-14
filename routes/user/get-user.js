@@ -2,7 +2,7 @@ const UserModel = require("../../models/UserModel");
 module.exports = (router) => {
     router.get('/get-user', async (req, res) => {
         // TODO -- do this based on auth
-        let cognitoId = res.locals.user
+        let cognitoId = res.locals.user.sub
 
         if (!cognitoId) {
             return res.status(400).json("Not logged in")

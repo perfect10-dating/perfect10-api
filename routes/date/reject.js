@@ -7,7 +7,7 @@ const DateModel = require("../../models/DateModel");
 module.exports = (router) => {
     router.post('/reject-date', async (req, res) => {
         try {
-            let cognitoId = res.locals.user
+            let cognitoId = res.locals.user.sub
             let {dateId} = req.body
 
             if (!cognitoId || !dateId) {

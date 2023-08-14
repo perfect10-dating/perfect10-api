@@ -8,7 +8,7 @@ const MessageModel = require("../../models/MessageModel");
  */
 module.exports = (router) => {
     router.post('/post-message', async (req, res) => {
-        let cognitoId = res.locals.user
+        let cognitoId = res.locals.user.sub
 
         let {otherUserId, conversationId, text, isImage, imageUrl} = req.body
         if (!cognitoId || ((!conversationId || conversationId === "") && !otherUserId)) {
