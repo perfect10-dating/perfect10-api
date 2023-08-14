@@ -5,16 +5,17 @@ const {generateGroup} = require("../userGroup/generateGroup");
 module.exports = (router) => {
     router.post('/create-user', async (req, res) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
-        let {cognitoId, phoneNumber, firstName, identity, birthDate} = req.body
+        let {cognitoId, phoneNumber, firstName, identity, birthDate, longitude, latitude} = req.body
 
         console.log(req.body)
 
-        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate) {
+        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate || !longitude || !latitude) {
             console.log("CREATE-USER: Rejecting because of unspecified fields")
             return res.status(400).json("Make sure you specify all required fields")
         }
 
-        // TODO -- location
+        let locationCoords = [longitude, latitude]
+        let location = {type: 'Point', coordinates: locationCoords}
         let unixBirthDate = (new Date(birthDate)).getTime()
         let age = Math.floor((Date.now() - unixBirthDate) / (1000 * 60 * 60 * 24 * 365))
         // create a placeholder age range that seems reasonable
@@ -33,7 +34,7 @@ module.exports = (router) => {
             let groups = []
             for (let lookingForIdentity of req.body.lookingFor) {
                 console.log("CREATE-USER: Attempting to find a nearby group")
-                let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, req.body.locationCoords)
+                let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, locationCoords)
                 if (!group) {
                     console.log("CREATE-USER: Attempting to generate a group")
                     group = await generateGroup(req.body.identity, req.body.lookingFor, req.body.age, location, req.body.isBeginner)
@@ -54,14 +55,15 @@ module.exports = (router) => {
                 firstName: req.body.firstName,
                 identity: req.body.identity,
                 dateOfBirth: unixBirthDate,
+                location,
 
                 // emailAddress: req.body.emailAddress,
 
                 age: age,
-                location,
-                // lookingFor: req.body.lookingFor,
                 ageRange,
-                shortTerm: !!req.body.shortTerm,
+
+                // lookingFor: req.body.lookingFor,
+                // shortTerm: !!req.body.shortTerm,
                 userGroups: groups,
             })
 
