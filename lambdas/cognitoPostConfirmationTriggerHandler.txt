@@ -1,0 +1,23 @@
+import fetch from 'node-fetch'
+
+export const handler = async (event) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      // the user ID
+      cognitoId: event.request.userAttributes.sub,
+      birthDate: event.request.userAttributes.birthdate,
+      identity: event.request.userAttributes.gender,
+      firstName: event.request.userAttributes.given_name,
+      phoneNumber: event.request.userAttributes.phone_number,
+    })
+  };
+  await fetch("https://url/api/create", requestOptions)
+
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!'),
+  };
+  return response;
+};

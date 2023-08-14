@@ -6,6 +6,11 @@ module.exports = (router) => {
     router.post('/create-user', async (req, res) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
         let {cognitoId, phoneNumber, firstName, identity, birthDate} = req.body
+
+        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate) {
+            return res.status(400).json("Make sure you specify all required fields")
+        }
+
         // TODO -- location
         let unixBirthDate = (new Date(birthDate)).getTime()
         let age = Math.floor((Date.now() - (unixBirthDate) / (1000 * 60 * 60 * 24 * 365)))
