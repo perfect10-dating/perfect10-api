@@ -4,7 +4,7 @@ const ConversationModel = require("../../models/ConversationModel");
 const MessageModel = require("../../models/MessageModel");
 
 module.exports = (router) => {
-    router.get('/get-messages/:ownCognitoId/:otherUserId', async (req, res) => {
+    router.get('/get-messages/:otherUserId', async (req, res) => {
         let ownCognitoId = res.locals.user
       let {otherUserId} = req.params
       if (!ownCognitoId || !otherUserId) {
