@@ -5,9 +5,17 @@ const {generateGroup} = require("../userGroup/generateGroup");
 module.exports = (router) => {
     router.post('/create-user', async (req, res) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
-        let location = {type: "Point", coordinates: req.body.locationCoords}
+        let {cognitoId, phoneNumber, firstName, identity, birthDate} = req.body
+        // TODO -- location
+        let unixBirthDate = (new Date(birthDate)).getTime()
+        let age = Math.floor((Date.now() - (unixBirthDate) / (1000 * 60 * 60 * 24 * 365)))
+        // create a placeholder age range that seems reasonable
+        let ageRange = {
+            min: Math.max(18, age-3),
+            max: age+3
+        }
 
-        if (req.body.age < 18 || req.body.age > 150) {
+        if (age < 18 || age > 150) {
             return res.status(400).json("Age is too small or too large")
         }
 
@@ -30,16 +38,19 @@ module.exports = (router) => {
             await Promise.all(groups.map(group => group.save()))
 
             let user = new UserModel({
+                // explicit fields
                 cognitoId: req.body.cognitoId,
                 phoneNumber: req.body.phoneNumber,
-                emailAddress: req.body.emailAddress,
                 firstName: req.body.firstName,
                 identity: req.body.identity,
-                age: req.body.age,
-                dateOfBirth: req.body.dateOfBirth,
+                dateOfBirth: unixBirthDate,
+
+                // emailAddress: req.body.emailAddress,
+
+                age: age,
                 location,
-                lookingFor: req.body.lookingFor,
-                ageRange: req.body.ageRange,
+                // lookingFor: req.body.lookingFor,
+                ageRange,
                 shortTerm: !!req.body.shortTerm,
                 userGroups: groups,
             })

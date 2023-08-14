@@ -23,6 +23,7 @@ export const handler = async (event) => {
     }
 
     event.response.autoVerifyPhone = true
+    event.response.autoConfirmUser = true
 
     return event;
 };
