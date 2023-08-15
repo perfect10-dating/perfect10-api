@@ -35,6 +35,12 @@ module.exports = (router) => {
                 return res.status(400).json("You may not attempt to accept the date of two unknown users")
             }
 
+            // checks to see if the other person has accepted another date
+            let otherUserInDate = getOtherUserInDate(date, user._id)
+            if (otherUserInDate || otherUserInDate.mustReviewDate) {
+                return res.status(500).json("This user is no longer available")
+            }
+
             // accepts and saves the date
             date.accepted = true
             await date.save()

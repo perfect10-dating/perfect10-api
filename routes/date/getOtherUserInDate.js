@@ -1,15 +1,13 @@
 /**
- * Checks to see if userId is in either the users array or setupResponsibleUser
- * @param date
- * @param userId
+ * Returns the ID, or user object, of the other user in the date
  */
-function userInDate(date, userId) {
+function getOtherUserInDate(date, userId) {
     let setupResponsibleUserId = date.setupResponsibleUser._id
     if (!setupResponsibleUserId) {
         setupResponsibleUserId = date.setupResponsibleUser
     }
-    if (userId+"" === setupResponsibleUserId+"") {
-        return true
+    if (userId+"" !== setupResponsibleUserId+"") {
+        return date.setupResponsibleUser
     }
     for (let userInArr of date.users) {
         let userIdInArr = userInArr._id
@@ -18,9 +16,7 @@ function userInDate(date, userId) {
         }
         // case -- the id is a string
         if (userIdInArr+"" === userId+"") {
-            return true
+            return userInArr
         }
     }
 }
-
-module.exports = {userInDate}

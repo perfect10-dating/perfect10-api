@@ -29,10 +29,17 @@ module.exports = (router) => {
             let {_id} = user
 
             // find the date
-            let date = await DateModel.findOne({_id: dateId}).populate(["users"]).exec()
+            let date = await DateModel.findOne({_id: dateId}).populate(["users", "setupResponsibleUser"]).exec()
 
+            // checks to see if you're in the date
             if (!userInDate(date, user._id)) {
                 return res.status(400).json("You may not attempt to accept the date of two unknown users")
+            }
+
+            // checks to see if the other person has accepted another date
+            let otherUserInDate = getOtherUserInDate(date, user._id)
+            if (otherUserInDate || otherUserInDate.mustReviewDate) {
+                return res.status(500).json("This user is no longer available")
             }
 
             // accepts and saves the date
