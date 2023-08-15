@@ -6,7 +6,7 @@ module.exports = (router) => {
         // TODO -- do this based on auth
         let cognitoId = res.locals.user.sub
         // editable fields: lookingFor, lastName, shortTerm, ageRange, photoLinks
-        let {lookingFor, lastName, shortTerm, ageRange, photoLinks} = req.body
+        let {lookingFor, lastName, shortTerm, ageRange, photoLinks, location} = req.body
 
         try {
             let user = await UserModel.findOne({cognitoId})
@@ -15,6 +15,7 @@ module.exports = (router) => {
             user.shortTerm = (shortTerm === undefined) ? user.shortTerm : shortTerm
             user.ageRange = ageRange || user.ageRange
             user.photoLinks = photoLinks || user.photoLinks
+            user.location = location || user.location
 
             user.profileComplete = (user.lookingFor.length > 0 && user.photoLinks.length >= MIN_NUMBER_PHOTOS)
 
