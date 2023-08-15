@@ -28,8 +28,6 @@ module.exports = (router) => {
                 return res.status(404).json("User not found")
             }
 
-            user.locationCoords = user.location.coordinates
-
             return res.status(200).json(user)
         }
         catch (err) {

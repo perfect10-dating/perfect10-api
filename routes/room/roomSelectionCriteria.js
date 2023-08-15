@@ -28,7 +28,10 @@ function roomSelectionCriteria(user, choice, identity, minScore, maxScore) {
                         coordinates: user.location.coordinates
                 }
             }
-        }
+        },
+
+        // they have completed their profile (added photos...)
+        profileComplete: true,
     })
 }
 

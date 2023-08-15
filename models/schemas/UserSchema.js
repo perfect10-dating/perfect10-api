@@ -17,8 +17,8 @@ const UserSchema = new mongoose.Schema({
   firstName: {type: String, required: true},
   // the last name (optional)
   lastName: {type: String},
-  // the person's identity (man, woman, transMan, transWoman, nonbinary)
-  identity: {type: String, required: true},
+  // the person's identity
+  identity: {type: String, required: true, enum: ['man', 'woman', 'transMan', 'transWoman', 'nonBinary']},
   // the person's age (in years)
   age: {type: Number, required: true},
   dateOfBirth: {type: Date, required: true},
@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema({
   },
 
   photoLinks: [requiredString],
+  profileComplete: {type: Boolean, required: true, default: false},
   // END SECTION: personally identifiable information
 
   // BEGIN SECTION: dating preferences

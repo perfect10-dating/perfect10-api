@@ -104,7 +104,7 @@ require('./room/formRoom')(router)
 
 // user
 require('./user/create')(router)
-// require('./user/edit')(router)
+require('./user/edit')(router)
 require('./user/get-user')(router)
 require('./user/readyJoinRoom')(router)
 require('./user/switchGroups')(router)

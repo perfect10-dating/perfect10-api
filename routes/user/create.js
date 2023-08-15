@@ -7,8 +7,6 @@ module.exports = (router) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
         let {cognitoId, phoneNumber, firstName, identity, birthDate, longitude, latitude, lookingFor} = req.body
 
-        console.log(req.body)
-
         if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate || !longitude || !latitude ||
             !lookingFor
         ) {

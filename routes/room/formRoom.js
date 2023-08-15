@@ -21,7 +21,7 @@ const formRoomFunction = (cognitoId) => {
             else {
                 console.log(user)
 
-                if (user.temporarilyLocked || user.mustReviewDate) {
+                if (user.temporarilyLocked || user.mustReviewDate || !user.profileComplete) {
                     return reject("User is unsuitable for spawning a new room")
                 }
 
