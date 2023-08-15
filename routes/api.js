@@ -111,6 +111,9 @@ require('./user/switchGroups')(router)
 require('./user/unlock')(router)
 // require('./user/uploadPhotos')(router)
 
+// upload images
+require('./utils/util-route')(router)
+
 // END CUSTOM ROUTE REGISTRATION
 
 module.exports = router
