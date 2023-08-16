@@ -21,10 +21,10 @@ module.exports = (router) => {
                     select: ["sideOne", "sideOneIdentity", "sideTwo", "sideTwoIdentity"],
                     populate: [{
                         path: "sideOne",
-                        select: ["_id", "firstName", "identity", "age", "location"]
+                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks"]
                     }, {
                         path: "sideTwo",
-                        select: ["_id", "firstName", "identity", "age", "location"]
+                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks"]
                     }]
                 })
                 .lean().exec()

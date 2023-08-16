@@ -119,6 +119,8 @@ async function replaceUserInRoom(userObject) {
             let newUser = await UserModel.findOne(
                 roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity, scores.min, scores.max)
             )
+                // gives priorityMode priority, then the last users to queue (smallest value)
+                .sort({priorityMode: -1, roomEnqueueTime: 1})
                 .select(["_id", "waitingForRoom", "currentRoom"])
                 .exec()
 

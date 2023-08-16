@@ -11,7 +11,10 @@ module.exports = (router) => {
         }
 
         try {
-            let user = await UserModel.findOne({cognitoId}).select(["unlockTime", "temporarilyLocked"]).exec()
+            let user = await UserModel.findOne({cognitoId}).select(
+                ["unlockTime", "temporarilyLocked", "waitingForRoom", "roomEnqueueTime", "priorityMode",
+                    "priorityModeExpiryTime"
+                ]).exec()
 
             if (!user) {
                 return res.status(404).json("No user found")
@@ -24,6 +27,13 @@ module.exports = (router) => {
             }
             else {
                 user.waitingForRoom = true
+                user.roomEnqueueTime = Date.now()
+                // unsets PriorityMode if the user has passed
+                // if they enter the queue and then priorityMode expires, they keep that status into the next room
+                if (user.priorityModeExpiryTime && Date.now() > (new Date(user.priorityModeExpiryTime)).getTime()) {
+                    user.priorityModeExpiryTime = undefined
+                    user.priorityMode = false
+                }
                 await user.save()
 
                 return res.status(200).json("User may now join a room")

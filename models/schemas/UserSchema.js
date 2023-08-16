@@ -36,6 +36,11 @@ const UserSchema = new mongoose.Schema({
   },
 
   photoLinks: [requiredString],
+
+  // if there was a referring user, we'll mark them here
+  // this will not exist for most users
+  referringUser: {type: ObjectId, ref: 'user'},
+
   profileComplete: {type: Boolean, required: true, default: false},
   // END SECTION: personally identifiable information
 
@@ -66,8 +71,12 @@ const UserSchema = new mongoose.Schema({
   waitingForRoom: {type: Boolean, required: true, default: true, index: true},
   // the current room that the user is in
   currentRoom: {type: ObjectId, ref: "room", index: true},
-  // the user gets to skip the entry queue (will implement this as a paid feature in the future?)
-  entryQueueSkipped: {type: Boolean, required: true, default: false},
+  // the user gets to skip the room queue (will implement this as a paid feature in the future?)
+  priorityMode: {type: Boolean, required: true, default: false, index: true},
+  // the time that Priority Mode expires
+  priorityModeExpiryTime: {type: Date},
+  // the time that the user joined the room queue (older users --> more priority)
+  roomEnqueueTime: {type: Date, index: true},
 
   totalScore: {type: Number, required: true, default: 0},
   // the number of dates this person has had

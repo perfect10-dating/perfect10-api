@@ -85,6 +85,8 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                         roomSelectionCriteria(
                             user, user.identity, choice, otherGroupStdevData.minScore, otherGroupStdevData.maxScore
                         ))
+                        // gives priorityMode priority, then the last users to queue (smallest value)
+                        .sort({priorityMode: -1, roomEnqueueTime: 1})
                         .limit(10)
                         .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
                         .exec(),
@@ -96,6 +98,8 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     UserModel.find(roomSelectionCriteria(
                         user, choice, user.identity, userGroupStdevData.minScore, userGroupStdevData.maxScore
                     ))
+                        // gives priorityMode priority, then the last users to queue (smallest value)
+                        .sort({priorityMode: -1, roomEnqueueTime: 1})
                         .limit(9)
                         .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
                         .exec(),

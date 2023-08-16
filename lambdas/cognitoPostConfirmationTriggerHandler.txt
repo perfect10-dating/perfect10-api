@@ -1,18 +1,23 @@
 export const handler = async (event) => {
+  const body = {
+                     // the user ID
+                     cognitoId: event.request.userAttributes.sub,
+                     birthDate: event.request.userAttributes.birthdate,
+                     identity: event.request.userAttributes.gender,
+                     firstName: event.request.userAttributes.given_name,
+                     phoneNumber: event.request.userAttributes.phone_number,
+                     longitude: event.request.userAttributes["custom:longitude"],
+                     latitude: event.request.userAttributes["custom:latitude"],
+                     lookingFor: event.request["custom:lookingFor"].split(":"),
+                }
+  if (event.request["custom:referringUser"]) {
+    body.referringUser = event.request["custom:referringUser"]
+  }
+
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      // the user ID
-      cognitoId: event.request.userAttributes.sub,
-      birthDate: event.request.userAttributes.birthdate,
-      identity: event.request.userAttributes.gender,
-      firstName: event.request.userAttributes.given_name,
-      phoneNumber: event.request.userAttributes.phone_number,
-      longitude: event.request.userAttributes["custom:longitude"],
-      latitude: event.request.userAttributes["custom:latitude"],
-      lookingFor: event.request[custom:lookingFor].split(":"),
-    })
+    body: JSON.stringify(body)
   };
   await fetch("http://perfect10.us-east-1.elasticbeanstalk.com/api/create-user", requestOptions)
   return event
