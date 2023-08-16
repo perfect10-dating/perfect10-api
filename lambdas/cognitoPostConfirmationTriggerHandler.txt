@@ -8,7 +8,7 @@ export const handler = async (event) => {
                      phoneNumber: event.request.userAttributes.phone_number,
                      longitude: event.request.userAttributes["custom:longitude"],
                      latitude: event.request.userAttributes["custom:latitude"],
-                     lookingFor: event.request["custom:lookingFor"].split(":"),
+                     lookingFor: event.request.userAttributes["custom:lookingFor"].split(":"),
                 }
   if (event.request["custom:referringUser"]) {
     body.referringUser = event.request["custom:referringUser"]
