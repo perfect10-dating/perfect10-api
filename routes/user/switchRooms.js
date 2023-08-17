@@ -7,7 +7,7 @@ module.exports = (router) => {
     /*
     The user chooses to switch groups rather than date anybody
      */
-    router.post('/switch-groups-delayed', async (req, res) => {
+    router.post('/switch-rooms-delayed', async (req, res) => {
         try {
             let cognitoId = res.locals.user.sub
 
@@ -15,7 +15,6 @@ module.exports = (router) => {
                 return res.status(400).json("You must be authenticated")
             }
 
-            // TODO -- eventually we will want to allow use of cognitoIds from authentication rather than payload
             let user = await UserModel.findOne({cognitoId}).exec()
 
             // immediately switch out the user
@@ -30,11 +29,11 @@ module.exports = (router) => {
             user.currentRoom = null
 
             await user.save()
-            return res.status(200).json("User is now unlocked")
+            return res.status(200).json("User is now locked")
         }
         catch(err) {
             console.error(err)
-            return res.status(500).json("An error occurred when switching groups")
+            return res.status(500).json("An error occurred when switching rooms")
         }
     })
 

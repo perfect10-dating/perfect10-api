@@ -107,7 +107,7 @@ require('./user/create')(router)
 require('./user/edit')(router)
 require('./user/get-user')(router)
 require('./user/readyJoinRoom')(router)
-require('./user/switchGroups')(router)
+require('./user/switchRooms')(router)
 require('./user/unlock')(router)
 // require('./user/uploadPhotos')(router)
 
