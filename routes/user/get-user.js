@@ -13,7 +13,8 @@ module.exports = (router) => {
             let user = await UserModel.findOne({cognitoId}).select([
                 "_id", "cognitoId", "phoneNumber", "emailAddress", "firstName", "lastName", "identity", "age", "dateOfBirth",
                 "location", "photoLinks", "profileComplete", "lookingFor", "shortTerm", "ageRange", "waitingForRoom", "currentRoom",
-                "temporarilyLocked", "unlockTime", "mustReviewDate", "lockingDate"
+                "temporarilyLocked", "unlockTime", "mustReviewDate", "lockingDate",
+                "priorityMode", "priorityModeExpiryTime"
             ]).populate({
                 path: "lockingDate",
                 populate: [{
