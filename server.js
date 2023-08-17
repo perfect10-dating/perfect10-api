@@ -3,7 +3,7 @@ const https = require('https')
 const fs = require('fs')
 const bodyParser = require('body-parser')
 const logger = require('morgan')
-const auth = require('@aws-amplify/auth')
+// const auth = require('@aws-amplify/auth')
 const enableWs = require('express-ws')
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express')
@@ -13,9 +13,9 @@ const options = {
   definition: {
     openapi: '3.0.1',
     info: {
-      title: 'Perfect10 API',
+      title: 'Rizzly API',
       version: '1.0.0',
-      description: 'Perfect10 Express API',
+      description: 'Rizzly Express API',
     },
     servers: [
       // {
@@ -70,12 +70,6 @@ server.use((req, res, next) => {
 
 // configure amplify auth client
 global.fetch = require('node-fetch') // required for amplify auth functionality
-auth.default.configure({
-  region: 'us-east-1',
-  userPoolId: 'us-east-1_7hq9OmpnT',
-  userPoolWebClientId: '70fo00fpob1sd133m98k7b0jan',
-  authenticationFlowType: 'USER_SRP_AUTH'
-})
 
 // setup API router
 console.log('  Configuring endpoints...')

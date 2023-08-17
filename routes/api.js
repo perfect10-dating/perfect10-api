@@ -8,7 +8,7 @@ const CognitoRefreshToken = require('amazon-cognito-identity-js').CognitoRefresh
 // configure cognito-express
 const cognitoExpress = new CognitoExpress({
   region: 'us-east-1',
-  cognitoUserPoolId: 'us-east-1_dgaKxRACk',
+  cognitoUserPoolId: process.env.COGNITO_USER_POOL_ID || 'us-east-1_dgaKxRACk',
   tokenUse: 'id', // access or id
   tokenExpiration: 1000 * 60 * 60 * 24 // one day
 })
