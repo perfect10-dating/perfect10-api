@@ -68,7 +68,7 @@ const UserSchema = new mongoose.Schema({
   userGroups: [{type: ObjectId, required: true, ref: 'user-group'}],
 
   // the user is currently waiting for a room
-  waitingForRoom: {type: Boolean, required: true, default: true, index: true},
+  waitingForRoom: {type: Boolean, required: true, default: false, index: true},
   // the current room that the user is in
   currentRoom: {type: ObjectId, ref: "room", index: true},
   // the user gets to skip the room queue (will implement this as a paid feature in the future?)
