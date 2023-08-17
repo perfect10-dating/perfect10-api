@@ -2,11 +2,11 @@
 
 'use strict'
 
-console.log('\nStarting WordWiz API server...\n')
+console.log('\nStarting Rizzly API server...\n')
 
 var mongoose = require('mongoose')
 var PORT = process.env.PORT || 3001,
-  MONGO_DB = process.env.MONGO_DB || 'mongodb+srv://admin:kvvjqgCECwlhXHne@cluster0.oxoembv.mongodb.net/test?retryWrites=true&w=majority' // todo: move to environment variable
+    MONGO_DB = process.env.MONGO_DB || 'mongodb+srv://admin:kvvjqgCECwlhXHne@cluster0.oxoembv.mongodb.net/test?retryWrites=true&w=majority' // todo: move to environment variable
     // MONGO_DB = 'mongodb://localhost/27017'
 
 const executor = async () => {
@@ -16,7 +16,7 @@ const executor = async () => {
     
     console.log('  Connected to MongoDB.\n')
     var server = require('./server')
-    server.listen(PORT, () => console.log('\nRunning Perfect10 API server on port ' + PORT))
+    server.listen(PORT, () => console.log('\nRunning Rizzly API server on port ' + PORT))
     
     process.on('SIGINT', () => connection.close().then(() => process.exit(0)))
   }
