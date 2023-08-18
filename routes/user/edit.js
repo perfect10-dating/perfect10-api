@@ -11,7 +11,7 @@ module.exports = (router) => {
         let {lookingFor, lastName, shortTerm, ageRange, photoLinks, location} = req.body
 
         try {
-            let user = await UserModel.findOne({cognitoId})
+            let user = await UserModel.findOne({cognitoId}).populate(['userGroups'])
 
             // always update the user age
             let unixBirthDate = (new Date(user.dateOfBirth)).getTime()
