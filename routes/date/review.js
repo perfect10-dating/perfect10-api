@@ -98,7 +98,7 @@ module.exports = (router) => {
             let otherUserGroups = otherUser.userGroups
             // rescore these groups in light of the date
             for (let i = 0; i < otherUserGroups.length; i++) {
-                rescoreGroup(otherUserGroups[i], otherUser.roomScore, oldRoomScore, 1)
+                rescoreGroup(otherUserGroups[i], oldRoomScore, otherUser.roomScore, 1)
             }
 
             await Promise.all(otherUserGroups.map(group => group.save()))

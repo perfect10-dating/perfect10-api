@@ -30,6 +30,7 @@ async function joinProperGroups({identity, age, lookingFor, location, userScore,
                 groups.push(group)
             }
 
+            console.log("Joining new groups...")
             // save the groups
             await Promise.all(groups.map(group => group.save()))
 

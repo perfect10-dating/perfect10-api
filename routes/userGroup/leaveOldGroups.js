@@ -9,6 +9,7 @@ async function leaveOldGroups(user) {
                 // change the group scores, removing this user and their dates
                 rescoreGroup(group, user.totalRoomScore, 0, user.totalDates)
 
+                console.log("Leaving old groups...")
                 return group.save()
             }))
         }
