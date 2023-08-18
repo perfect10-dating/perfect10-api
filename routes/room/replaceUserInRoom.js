@@ -69,7 +69,7 @@ async function removeUserFromRoom(userObject) {
             }
 
             await room.save()
-            resolve("Removing user from room successful")
+            resolve({msg: "Removing user from room successful", room, onSideTwo})
         }
         catch(err) {
             reject(err)

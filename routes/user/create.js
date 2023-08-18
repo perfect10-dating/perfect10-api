@@ -1,6 +1,7 @@
 const UserModel = require("../../models/UserModel");
 const {findClosestGroup} = require("../userGroup/findClosestGroup");
 const {generateGroup} = require("../userGroup/generateGroup");
+const {joinProperGroups} = require("../userGroup/joinProperGroups");
 
 const PRIORITY_TIME_INC_MS = 1000 * 60 * 60 * 24 * 30     // 1 month
 
@@ -33,22 +34,9 @@ module.exports = (router) => {
         }
 
         try {
-            // find all sub-groups; i.e, looking for [men, women] --> looking for [[men], [women]]
-            let groups = []
-            for (let lookingForIdentity of req.body.lookingFor) {
-                console.log("CREATE-USER: Attempting to find a nearby group")
-                let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, locationCoords)
-                if (!group) {
-                    console.log("CREATE-USER: Attempting to generate a group")
-                    group = await generateGroup(req.body.identity, req.body.lookingFor, req.body.age, location, req.body.isBeginner)
-                    console.log("CREATE-USER: Group generated")
-                }
-                group.totalCount += 1
-                groups.push(group)
-            }
-
-            // save the groups
-            await Promise.all(groups.map(group => group.save()))
+            const groups = await joinProperGroups({
+                identity, age, lookingFor, locationCoords, userScore: 0, dateChange: 0
+            })
 
             console.log("CREATE-USER: Generating the user object")
             let user = new UserModel({

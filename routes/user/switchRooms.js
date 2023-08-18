@@ -1,7 +1,8 @@
 // the number of days to delay a user switching groups
 const UserModel = require("../../models/UserModel");
 const {removeUserFromRoom} = require("../room/replaceUserInRoom");
-DELAY_NUMBER_DAYS = 3
+const DELAY_NUMBER_DAYS = 3
+const MAX_UNBALANCE = .30    // 3:4 person ratio (1/3) causes penalties, but 4:6 (2/4) does not
 
 module.exports = (router) => {
     /*
@@ -18,14 +19,19 @@ module.exports = (router) => {
             let user = await UserModel.findOne({cognitoId}).exec()
 
             // immediately switch out the user
-            await removeUserFromRoom(user)
+            const {room, onSideTwo} = await removeUserFromRoom(user)
 
-            // now make the user wait several days before they can join a new room
-            let currentTime = Date.now()
-            let newTime = currentTime + 86400000*DELAY_NUMBER_DAYS
+            // don't penalize people from leaving unbalanced rooms
+            if (onSideTwo ? (room.sideTwo.length-room.sideOne.length)/(room.sideOne.length||1) < MAX_UNBALANCE
+                : (room.sideOne.length-room.sideTwo.length)/(room.sideTwo.length||1) < MAX_UNBALANCE) {
+                // now make the user wait several days before they can join a new room
+                let currentTime = Date.now()
+                let newTime = currentTime + 86400000*DELAY_NUMBER_DAYS
 
-            user.temporarilyLocked = true
-            user.unlockTime = newTime
+                user.temporarilyLocked = true
+                user.unlockTime = newTime
+            }
+
             user.currentRoom = null
 
             await user.save()

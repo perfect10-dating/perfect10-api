@@ -5,6 +5,7 @@ const UserModel = require("../../models/UserModel");
 const DateReviewModel = require("../../models/DateReviewModel");
 const {removeUserFromRoom} = require("../room/replaceUserInRoom");
 const {generateScore} = require("./generateScore");
+const {rescoreGroup} = require("../userGroup/rescoreGroup");
 module.exports = (router) => {
     router.post('/review-date', async (req, res) => {
         try {
@@ -86,6 +87,7 @@ module.exports = (router) => {
 
             otherUser.totalScore = totalScore
             otherUser.totalDates = totalDates
+            const oldRoomScore = otherUser.roomScore
             otherUser.roomScore = roomScore
 
             // save the new score
@@ -94,17 +96,9 @@ module.exports = (router) => {
 
             // find the user group the other user belongs to
             let otherUserGroups = otherUser.userGroups
+            // rescore these groups in light of the date
             for (let i = 0; i < otherUserGroups.length; i++) {
-                // calculate the new mean and std dev
-                otherUserGroups[i].totalDates += 1
-                otherUserGroups[i].totalRoomScore += otherUser.roomScore
-                otherUserGroups[i].totalSquaredRoomScore += Math.pow(otherUser.roomScore, 2)
-                otherUserGroups[i].averageRoomScore = otherUserGroups[i].totalRoomScore / otherUserGroups[i].totalCount
-                // stDev = sqrt(E(X^2) - E(X)^2)
-                otherUserGroups[i].roomScoreStdDev = Math.sqrt(
-                    otherUserGroups[i].totalSquaredRoomScore / otherUserGroups[i].totalCount
-                    - Math.pow(otherUserGroups[i].averageRoomScore, 2)
-                )
+                rescoreGroup(otherUserGroups[i], otherUser.roomScore, oldRoomScore, 1)
             }
 
             await Promise.all(otherUserGroups.map(group => group.save()))

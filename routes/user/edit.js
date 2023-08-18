@@ -1,4 +1,6 @@
 const UserModel = require("../../models/UserModel");
+const {joinProperGroups} = require("../userGroup/joinProperGroups");
+const {leaveOldGroups} = require("../userGroup/leaveOldGroups");
 const MIN_NUMBER_PHOTOS = 4
 
 module.exports = (router) => {
@@ -10,6 +12,11 @@ module.exports = (router) => {
 
         try {
             let user = await UserModel.findOne({cognitoId})
+
+            // always update the user age
+            let unixBirthDate = (new Date(user.birthDate)).getTime()
+            user.age = Math.floor((Date.now() - unixBirthDate) / (1000 * 60 * 60 * 24 * 365))
+
             user.lookingFor = lookingFor || user.lookingFor
             user.lastName = lastName || user.lastName
             user.shortTerm = (shortTerm === undefined) ? user.shortTerm : shortTerm
@@ -18,6 +25,19 @@ module.exports = (router) => {
             user.location = location || user.location
 
             user.profileComplete = (user.lookingFor.length > 0 && user.photoLinks.length >= MIN_NUMBER_PHOTOS)
+
+            // if the user changes what they are looking for, change the groups the user is part of
+            // TODO -- change groups if the person moves to a significantly different place
+            if (user.lookingFor) {
+                // leave the old groups
+                await leaveOldGroups(user)
+                // join
+                user.userGroups = await joinProperGroups({
+                    identity: user.identity, age: user.age,
+                    lookingFor, locationCoords: user.location.coordinates,
+                    userScore: user.totalScore, dateChange: user.totalDates
+                })
+            }
 
             await user.save()
             return res.status(200).json("Saved")
