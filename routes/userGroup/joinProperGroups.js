@@ -7,17 +7,17 @@ async function joinProperGroups({identity, age, lookingFor, locationCoords, user
         try {
             // find all sub-groups; i.e, looking for [men, women] --> looking for [[men], [women]]
             let groups = []
-            for (let lookingForIdentity of req.body.lookingFor) {
+            for (let lookingForIdentity of lookingFor) {
                 // avoid any undefined identities
                 if (!lookingForIdentity) {
                     continue
                 }
 
                 console.log("JOIN-PROPER-GROUPS: Attempting to find a nearby group")
-                let group = await findClosestGroup(req.body.identity, req.body.lookingFor, req.body.age, locationCoords)
+                let group = await findClosestGroup(identity, [lookingForIdentity], age, locationCoords)
                 if (!group) {
                     console.log("JOIN-PROPER-GROUPS: Attempting to generate a group")
-                    group = await generateGroup(req.body.identity, [lookingForIdentity], req.body.age, location, req.body.isBeginner)
+                    group = await generateGroup(identity, [lookingForIdentity], age, location)
                     console.log("JOIN-PROPER-GROUPS: Group generated")
                 }
                 group.totalCount += 1
