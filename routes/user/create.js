@@ -35,7 +35,7 @@ module.exports = (router) => {
 
         try {
             const groups = await joinProperGroups({
-                identity, age, lookingFor, locationCoords, userScore: 0, dateChange: 0
+                identity, age, lookingFor, location, userScore: 0, dateChange: 0
             })
 
             console.log("CREATE-USER: Generating the user object")

@@ -2,7 +2,7 @@ const {findClosestGroup} = require("./findClosestGroup");
 const {generateGroup} = require("./generateGroup");
 const {rescoreGroup} = require("./rescoreGroup");
 
-async function joinProperGroups({identity, age, lookingFor, locationCoords, userScore, dateChange}){
+async function joinProperGroups({identity, age, lookingFor, location, userScore, dateChange}){
     return new Promise(async (resolve, reject) => {
         try {
             // find all sub-groups; i.e, looking for [men, women] --> looking for [[men], [women]]
@@ -14,7 +14,7 @@ async function joinProperGroups({identity, age, lookingFor, locationCoords, user
                 }
 
                 console.log("JOIN-PROPER-GROUPS: Attempting to find a nearby group")
-                let group = await findClosestGroup(identity, [lookingForIdentity], age, locationCoords)
+                let group = await findClosestGroup(identity, [lookingForIdentity], age, location.coordinates)
                 if (!group) {
                     console.log("JOIN-PROPER-GROUPS: Attempting to generate a group")
                     group = await generateGroup(identity, [lookingForIdentity], age, location)

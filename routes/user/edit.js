@@ -14,7 +14,7 @@ module.exports = (router) => {
             let user = await UserModel.findOne({cognitoId})
 
             // always update the user age
-            let unixBirthDate = (new Date(user.birthDate)).getTime()
+            let unixBirthDate = (new Date(user.dateOfBirth)).getTime()
             user.age = Math.floor((Date.now() - unixBirthDate) / (1000 * 60 * 60 * 24 * 365))
 
             user.lookingFor = lookingFor || user.lookingFor
@@ -36,7 +36,7 @@ module.exports = (router) => {
                 // join
                 user.userGroups = await joinProperGroups({
                     identity: user.identity, age: user.age,
-                    lookingFor, locationCoords: user.location.coordinates,
+                    lookingFor, location: user.location,
                     userScore: user.totalScore, dateChange: user.totalDates
                 })
             }
