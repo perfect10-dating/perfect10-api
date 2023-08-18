@@ -32,6 +32,7 @@ module.exports = (router) => {
                 if (user.userGroups.length > 0) {
                     // leave the old groups
                     await leaveOldGroups(user)
+                    console.log("left old groups")
                 }
                 // join
                 user.userGroups = await joinProperGroups({

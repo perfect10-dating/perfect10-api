@@ -9,10 +9,10 @@ function rescoreGroup(group, oldUserScore, newUserScore, dateChange) {
     if (!isNaN(oldUserScore) && !isNaN(newUserScore)) {
         group.totalRoomScore += (newUserScore-oldUserScore)
         group.totalSquaredRoomScore += (Math.pow(newUserScore, 2) - Math.pow(oldUserScore, 2))
-        group.averageRoomScore = group.totalRoomScore / group.totalCount
+        group.averageRoomScore = group.totalRoomScore / (group.totalCount||1)
         // stDev = sqrt(E(X^2) - E(X)^2)
         group.roomScoreStdDev = Math.sqrt(
-            group.totalSquaredRoomScore / group.totalCount
+            group.totalSquaredRoomScore / (group.totalCount||1)
             - Math.pow(group.averageRoomScore, 2)
         )
     }
