@@ -17,7 +17,7 @@ module.exports = (router) => {
             console.log("CREATE-USER: Rejecting because of unspecified fields")
             return res.status(400).json("Make sure you specify all required fields")
         }
-        
+
         let locationCoords = [longitude, latitude]
         let location = {type: 'Point', coordinates: locationCoords}
         let unixBirthDate = (new Date(birthDate)).getTime()

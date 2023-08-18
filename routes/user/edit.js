@@ -28,9 +28,11 @@ module.exports = (router) => {
 
             // if the user changes what they are looking for, change the groups the user is part of
             // TODO -- change groups if the person moves to a significantly different place
-            if (user.lookingFor) {
-                // leave the old groups
-                await leaveOldGroups(user)
+            if (lookingFor && lookingFor.length > 0) {
+                if (user.userGroups.length > 0) {
+                    // leave the old groups
+                    await leaveOldGroups(user)
+                }
                 // join
                 user.userGroups = await joinProperGroups({
                     identity: user.identity, age: user.age,
