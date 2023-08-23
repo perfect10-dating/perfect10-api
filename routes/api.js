@@ -17,7 +17,8 @@ const cognitoExpress = new CognitoExpress({
 // BEGIN ROUTE AUTHENTICATION
 // specify routes that permit unauthenticated access
 const UNAUTHENTICATED_ROUTES = [
-    '/create-user'
+    '/create-user',
+    '/generate-random-users'
 ]
 
 const ADMIN_ROUTES = []
@@ -109,7 +110,7 @@ require('./user/get-user')(router)
 require('./user/readyJoinRoom')(router)
 require('./user/switchRooms')(router)
 require('./user/unlock')(router)
-// require('./user/uploadPhotos')(router)
+require('./user/generate-random-users')(router)
 
 // upload images
 require('./utils/util-route')(router)
