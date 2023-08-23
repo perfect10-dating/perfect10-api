@@ -239,12 +239,13 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     offset += 10
                 }
 
-                return resolve({potentialPartners, competitors, ageRange})
+                return resolve({potentialPartners, competitors, sideOneAgeRange: ageRange})
             }
 
             // TWO-SIDED DATING
             else {
                 // FIND PARTNERS
+                let sideOneAgeRange = {min: user.age, max: user.age}
                 let offset = 0
                 while (potentialPartners.length < TWO_SIDED_POTENTIAL_PARTNER_COUNT) {
                     let newPotentialPartners = await findUserFunction({
@@ -272,11 +273,19 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         })
                     )
 
+                    // change the age range and filter if needed
+                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
+                        oldMin: sideOneAgeRange.min, oldMax: sideOneAgeRange.max, oldUserArray: potentialPartners
+                    })
+                    sideOneAgeRange = newAgeRange
+                    potentialPartners = newUserArray
+
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${TWO_SIDED_POTENTIAL_PARTNER_COUNT} partners for two-sided`)
                     offset += 10
                 }
 
                 // TWO-SIDED DATING: Find competitors
+                let sideTwoAgeRange = {min: user.age, max: user.age}
                 offset = 0
                 while (competitors.length < TWO_SIDED_COMPETITOR_COUNT) {
                     let newCompetitors = await findUserFunction({
@@ -304,11 +313,17 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         })
                     )
 
+                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
+                        oldMin: sideTwoAgeRange.min, oldMax: sideTwoAgeRange.max, oldUserArray: competitors
+                    })
+                    sideTwoAgeRange = newAgeRange
+                    competitors = newUserArray
+
                     console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${TWO_SIDED_COMPETITOR_COUNT} competitors for two-sided`)
                     offset += 10
                 }
 
-                return resolve({potentialPartners, competitors, })
+                return resolve({potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange})
             }
         }
         catch (err) {

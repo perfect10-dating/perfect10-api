@@ -77,8 +77,10 @@ const formRoomFunction = (cognitoId, checkProfileComplete) => {
                 console.log(`FORM-ROOM: user has a stdev score of ${userStdDev}, defining ${JSON.stringify(userGroupStdevData)} for their own\
 group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
+
+                // ==================== ACTUALLY RUN QUERY FOR USERS ======================================
                 console.log("FORM-ROOM: searching for dates and competitors")
-                let {potentialPartners, competitors} = await dateCompetitorFindFunction({
+                let {potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange} = await dateCompetitorFindFunction({
                     user,
                     choiceIdentity: choice,
                     group1MinScore: isOneSided ? userGroupStdevData.minScore : otherGroupStdevData.minScore,
@@ -120,9 +122,11 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     sideOne: dates,
                     sideOneIdentity: choice,
                     sideOneScores: {min: otherGroupStdevData.minScore, max: otherGroupStdevData.maxScore},
+                    sideOneAgeRange,
                     sideTwo: competitors,
                     sideTwoIdentity: user.identity,
                     sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
+                    sideTwoAgeRange,
                 })
 
                 console.log("FORM-ROOM: Saving room")

@@ -35,8 +35,6 @@ function roomSelectionCriteria({user, choice, identity, minScore, maxScore, chec
         obj["waitingForRoom"] = true
     }
 
-    console.log(obj)
-
     return obj
 }
 
