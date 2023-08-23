@@ -93,8 +93,10 @@ async function replaceUserInRoom(userObject) {
             // depending on what side we're on, find the user and remove them from that side
             let workingArray = []
             let scores
+            let ageRange
             if (onSideTwo) {
                 scores = room.sideTwoScores
+                ageRange = room.sideTwoAgeRange
                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
                     if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideTwo[userIndex])
@@ -103,7 +105,8 @@ async function replaceUserInRoom(userObject) {
                 room.sideTwo = workingArray
             }
             else {
-                scores = room.sideTwoScores
+                scores = room.sideOneScores
+                ageRange = room.sideOneAgeRange
                 for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
                     if (room.sideOne[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideOne[userIndex])
@@ -117,7 +120,8 @@ async function replaceUserInRoom(userObject) {
 
             // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
             let newUser = await UserModel.findOne(
-                roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity, scores.min, scores.max, true)
+                roomSelectionCriteria({user: room.spawningUser, lookingFor: targetLookingFor, identity: targetIdentity,
+                    minScore: scores.min, maxScore: scores.max, checkProfileComplete: true, ageRange})
             )
                 // gives priorityMode priority, then the last users to queue (smallest value)
                 .sort({priorityMode: -1, roomEnqueueTime: 1})

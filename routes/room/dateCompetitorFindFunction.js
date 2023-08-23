@@ -21,16 +21,18 @@ const TWO_SIDED_COMPETITOR_COUNT = 9
  * @returns {Promise<*>}
  */
 async function findUserFunction({UserModelObject, user, choice, identity, minScore, maxScore,
-                                    searchCount, offset, checkProfileComplete}) {
+                                    searchCount, offset, checkProfileComplete, ageRange}) {
     return UserModelObject.find(
         roomSelectionCriteria(
-            user, choice, identity, minScore, maxScore, checkProfileComplete
+            {
+                user, choice, identity, minScore, maxScore, checkProfileComplete, ageRange
+            }
         ))
         // gives priorityMode priority, then the last users to queue (smallest value)
         .sort({priorityMode: -1, roomEnqueueTime: 1})
         .skip(offset)
         .limit(searchCount)
-        .select(["_id", "waitingForRoom", "identity", "currentRoom"])
+        .select(["_id", "waitingForRoom", "identity", "currentRoom", "ageRange", "age"])
         .exec()
 }
 
@@ -121,6 +123,45 @@ async function screenUsers({DateModelObject, usersToScreen, screeningUsers}) {
 }
 
 /**
+ * users at lowest indexes get priority
+ *
+ * @param oldMin
+ * @param oldMax
+ */
+function getNewAgeRangeAndFilterUsers({oldMin, oldMax, oldUserArray}) {
+    let min = oldMin
+    let max = oldMax
+    let newUserArray = []
+
+    for (let user of oldUserArray) {
+        if (user.age < min) {
+            min = user.age
+        }
+        if (user.age > max) {
+            max = user.age
+        }
+    }
+
+    let newAgeRange = {min: oldMin, max: oldMax}
+    // now filter based on whether your ageRange is permissive enough
+    for (let user of oldUserArray) {
+        if (user.ageRange.min < min && user.ageRange.max > max) {
+            newUserArray.push(user)
+
+            // ironically, we need to recalculate this in case removed people change the range
+            if (user.age < newAgeRange.min) {
+                newAgeRange.min = user.age
+            }
+            if (user.age > newAgeRange.max) {
+                newAgeRange.max = user.age
+            }
+        }
+    }
+
+    return {newUserArray, newAgeRange}
+}
+
+/**
  * Cases:
  *  1. One-sided dating: return 9 valid users who have not been on dates with each other or the spawning user
  *      len(potentialPartners) = 9; len(competitors) = 0
@@ -158,6 +199,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
             // ONE-SIDED DATING
             if (isOneSided) {
+                let ageRange = {min: user.age, max: user.age}
                 let offset = 0
                 while (potentialPartners.length < ONE_SIDED_POTENTIAL_PARTNER_COUNT) {
                     let newPotentialPartners = await findUserFunction({
@@ -169,7 +211,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         maxScore: group1MaxScore,
                         searchCount: 10,
                         offset,
-                        checkProfileComplete
+                        checkProfileComplete,
+                        ageRange
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -185,11 +228,18 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         })
                     )
 
+                    // change the age range and filter if needed
+                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
+                        oldMin: ageRange.min, oldMax: ageRange.max, oldUserArray: potentialPartners
+                    })
+                    ageRange = newAgeRange
+                    potentialPartners = newUserArray
+
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${ONE_SIDED_POTENTIAL_PARTNER_COUNT} partners for one-sided`)
                     offset += 10
                 }
 
-                return resolve({potentialPartners, competitors})
+                return resolve({potentialPartners, competitors, ageRange})
             }
 
             // TWO-SIDED DATING
@@ -258,7 +308,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     offset += 10
                 }
 
-                return resolve({potentialPartners, competitors})
+                return resolve({potentialPartners, competitors, })
             }
         }
         catch (err) {

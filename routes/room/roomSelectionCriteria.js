@@ -1,4 +1,4 @@
-function roomSelectionCriteria(user, choice, identity, minScore, maxScore, checkProfileComplete) {
+function roomSelectionCriteria({user, choice, identity, minScore, maxScore, checkProfileComplete, ageRange}) {
     let obj = {
         // not the same _id
         _id: {$ne: user._id},
@@ -14,8 +14,8 @@ function roomSelectionCriteria(user, choice, identity, minScore, maxScore, check
         // in the age range
         age: {$lte: user.ageRange.max, $gte: user.ageRange.min},
         // they are also less or equally selective than the user
-        "ageRange.max": {$gte: user.ageRange.max},
-        "ageRange.min": {$lte: user.ageRange.min},
+        "ageRange.max": {$gte: ageRange.max},
+        "ageRange.min": {$lte: ageRange.min},
         // make sure that they are within the score range for the room
         roomScore: {$gte: minScore, $lte: maxScore},
 
