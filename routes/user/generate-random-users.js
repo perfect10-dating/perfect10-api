@@ -1,8 +1,9 @@
 const UserModel = require("../../models/UserModel");
 const {createUtility} = require("./create-utility");
 const AGE_CENTER_POINT = 25
-const AGE_DISTRIBUTION = 5   // (+/- 5)
-const AGE_RANGE_MAX_SPREAD = 5
+const AGE_DISTRIBUTION = 2   // (+/- 5)
+const AGE_RANGE_MAX_SPREAD = 2  // in number of ticks
+const AGE_RANGE_TICK_SIZE = 2
 
 module.exports = (router) => {
     router.post('/generate-random-users', async (req, res) => {
@@ -13,7 +14,7 @@ module.exports = (router) => {
             // only do these two for now
             const possibleIdentities = ['man', 'woman']
             let userObjects = userFirstNames.map(name => {
-                let age = 25 + (2*AGE_DISTRIBUTION*(Math.random()-0.5))
+                let age = 20 + Math.floor((Math.random()*(2*AGE_DISTRIBUTION+1)) - AGE_DISTRIBUTION)
                 return {
                     identity: possibleIdentities[Math.floor(Math.random() * possibleIdentities.length)],
                     age,
@@ -24,8 +25,9 @@ module.exports = (router) => {
                     unixBirthDate: 0,
                     location: {type: "Point", coordinates: [longitude, latitude]},
                     ageRange: {
-                        min: age - (AGE_RANGE_MAX_SPREAD*(Math.random())),
-                        max: age + (AGE_RANGE_MAX_SPREAD*(Math.random()))
+                        // ASSUME that the user always goes at least one tick over / under, and as many as AGE_RANGE_MAX_SPREAD
+                        min: age - Math.floor((AGE_RANGE_MAX_SPREAD*(Math.random()))+1)*AGE_RANGE_TICK_SIZE,
+                        max: age + Math.floor((AGE_RANGE_MAX_SPREAD*(Math.random()))+1)*AGE_RANGE_TICK_SIZE
                     }
                 }
             })
