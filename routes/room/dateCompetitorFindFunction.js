@@ -123,42 +123,116 @@ async function screenUsers({DateModelObject, usersToScreen, screeningUsers}) {
 }
 
 /**
- * users at lowest indexes get priority
+ * This is an optimization problem.
+ * Out of users in oldUserArray, we want to find the "best" newUserAmount (if possible), where "best"
+ * minimizes selectionAgeRange (the range of ages within this range of users) and maximizes ageRange
+ * (the largest minimum and smallest maximum)
  *
- * @param oldMin
- * @param oldMax
+ * We do this by:
+ * 1. Finding the user which is close to setPointAge and has a wide ageRange including setPointAge
+ * 2. Score all other users based on age distance to this user and ageRange within this boundingAgeRange
+ *  (i.e., having a giant age range that is useless in this context is not rewarded), and get the best one
+ * 3. Keep going until either all users are invalid (no ageRange overlap, or age is no longer in selectionAgeRange
+ *
+ * We make the following rules:
+ * 1. selectionAgeRange contains all user.age
+ * 2. ageRange also contains all user.age
  */
-function getNewAgeRangeAndFilterUsers({oldMin, oldMax, oldUserArray}) {
-    let min = oldMin
-    let max = oldMax
+function getNewAgeRangeAndFilterUsers({setPointAge, oldUserArray, newUserAmount}) {
+    if (oldUserArray.length === 0) {
+        return {}
+    }
+
+    let invalidIndexSet = new Set()
+    let newSelectionAgeRange
+    let newAgeRange
+    let referenceAge
     let newUserArray = []
 
-    for (let user of oldUserArray) {
-        if (user.age < min) {
-            min = user.age
-        }
-        if (user.age > max) {
-            max = user.age
-        }
-    }
+    // Step 1: get the best user which is a balance of the closest age to setPointAge and broadest ageRange
+    let bestScore = 0
+    let bestScoreUserIndex = 0
+    for (let i = 0; i < oldUserArray.length; i++) {
+        let user = oldUserArray[i]
 
-    let newAgeRange = {min: oldMin, max: oldMax}
-    // now filter based on whether your ageRange is permissive enough
-    for (let user of oldUserArray) {
-        if (user.ageRange.min < min && user.ageRange.max > max) {
-            newUserArray.push(user)
+        // if the user doesn't include themselves in their own ageRange, they are an invalid seed
+        if (user.age < user.ageRange.min || user.age > user.ageRange.max) {
+            invalidIndexSet.add(i)
+            continue
+        }
 
-            // ironically, we need to recalculate this in case removed people change the range
-            if (user.age < newAgeRange.min) {
-                newAgeRange.min = user.age
-            }
-            if (user.age > newAgeRange.max) {
-                newAgeRange.max = user.age
-            }
+        // otherwise, calculate score
+        let score = -Math.abs(user.age-setPointAge)
+            + Math.sqrt(user.age-user.ageRange.min)
+            + Math.sqrt(user.ageRange.max-user.age)
+        if (score > bestScore) {
+            bestScore = score
+            bestScoreUserIndex = i
         }
     }
 
-    return {newUserArray, newAgeRange}
+    let bestScoringUser = oldUserArray[bestScoreUserIndex]
+    newUserArray.push(bestScoringUser)
+    newSelectionAgeRange = {min: bestScoringUser.age, max: bestScoringUser.age}
+    newAgeRange = {min: bestScoringUser.ageRange.min, max: bestScoringUser.ageRange.max}
+    referenceAge = bestScoringUser.age
+    invalidIndexSet.add(bestScoreUserIndex)
+
+    // now loop repeatedly, selecting the best score each time
+    while (invalidIndexSet.size < oldUserArray.length && newUserArray.length < newUserAmount) {
+        let bestScore = 0
+        let bestScoreUserIndex = 0
+        for (let i = 0; i < oldUserArray.length; i++) {
+            if (invalidIndexSet.has(i)) {
+                continue
+            }
+
+            let user = oldUserArray[i]
+
+            // if the user age isn't in newAgeRange, the user is now invalid
+            if (user.age < newAgeRange.min || user.age > newAgeRange.max) {
+                invalidIndexSet.add(i)
+                continue
+            }
+            // if the referenceAge isn't in the user age range, the user is now invalid
+            if (referenceAge < user.ageRange.min || referenceAge > user.ageRange.max) {
+                invalidIndexSet.add(i)
+                continue
+            }
+
+            // otherwise, calculate score
+            // first, calculate the proximityScoreComponent
+            let proximityScoreComponent = 0
+            // always negative
+            if (user.age > newSelectionAgeRange.max) {
+                proximityScoreComponent = newSelectionAgeRange.max-user.age
+            }
+            if (user.age < newSelectionAgeRange.min) {
+                proximityScoreComponent = user.age-newSelectionAgeRange.min
+            }
+
+            let score = proximityScoreComponent
+                // calculate difference between reference age and the more restrictive range
+                + Math.sqrt(referenceAge-Math.max(user.ageRange.min, newAgeRange.min))
+                // calculate difference between reference age and the more restrictive range
+                + Math.sqrt(Math.min(user.ageRange.max, newAgeRange.max) - referenceAge)
+            if (score > bestScore) {
+                bestScore = score
+                bestScoreUserIndex = i
+            }
+        }
+
+        // update the ranges
+        let bestScoringUser = oldUserArray[bestScoreUserIndex]
+        newUserArray.push(bestScoringUser)
+        newSelectionAgeRange = {min: Math.min(bestScoringUser.age, newSelectionAgeRange.min),
+                                max: Math.max(bestScoringUser.age, newSelectionAgeRange.max)}
+        newAgeRange = {min: Math.max(bestScoringUser.ageRange.min, newAgeRange.min),
+                        max: Math.min(bestScoringUser.ageRange.max, newAgeRange.max)}
+        invalidIndexSet.add(bestScoreUserIndex)
+    }
+
+    return {newUserArray, newAgeRange, newSelectionAgeRange}
 }
 
 /**
@@ -209,7 +283,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
-                        searchCount: 10,
+                        searchCount: 20,
                         offset,
                         checkProfileComplete,
                         ageRange,
@@ -229,15 +303,20 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         })
                     )
 
-                    // change the age range and filter if needed
-                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
-                        oldMin: ageRange.min, oldMax: ageRange.max, oldUserArray: potentialPartners
+                    // find the optimal age range and filter if needed
+                    const {newUserArray, newSelectionAgeRange} = getNewAgeRangeAndFilterUsers({
+                        // just the average of the ageRange; a pretty likely place for user ages to center
+                        setPointAge: (user.ageRange.max-user.ageRange.min)/2,
+                        oldUserArray: potentialPartners,
+                        newUserAmount: ONE_SIDED_POTENTIAL_PARTNER_COUNT
                     })
-                    ageRange = newAgeRange
+                    // because this is one-sided: all users must be more permissive that the currently existing
+                    // user age ranges
+                    ageRange = newSelectionAgeRange
                     potentialPartners = newUserArray
 
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${ONE_SIDED_POTENTIAL_PARTNER_COUNT} partners for one-sided`)
-                    offset += 10
+                    offset += 20
                 }
 
                 return resolve({potentialPartners, competitors, sideOneAgeRange: ageRange})
@@ -246,8 +325,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
             // TWO-SIDED DATING
             else {
                 // FIND PARTNERS
-                let sideOneAgeRange = {min: 0, max: 0}
-                let sideOneAgeRangeUninit = true
+                let sideOneSelectionAgeRange
+                let sideTwoSelectionAgeRange
                 let offset = 0
                 while (potentialPartners.length < TWO_SIDED_POTENTIAL_PARTNER_COUNT) {
                     let newPotentialPartners = await findUserFunction({
@@ -257,7 +336,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
-                        searchCount: 10,
+                        searchCount: 20,
                         offset,
                         checkProfileComplete,
                         ageRange: {min: user.age, max: user.age},     // NOTE -- this doesn't change (for now),
@@ -276,33 +355,23 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                             screeningUsers: [user]
                         })
                     )
-                    if (sideOneAgeRangeUninit && potentialPartners.length > 0) {
-                        sideOneAgeRangeUninit = false
-                        // set this to something possible
-                        sideOneAgeRange = {min: potentialPartners[0].age, max: potentialPartners[0].age}
-                    }
 
-                    // change the age range but DO NOT FILTER!
-                    const {newAgeRange} = getNewAgeRangeAndFilterUsers({
-                        oldMin: sideOneAgeRange.min, oldMax: sideOneAgeRange.max, oldUserArray: potentialPartners
+                    // find the optimal age range and filter if needed
+                    const {newUserArray, newSelectionAgeRange, newAgeRange} = getNewAgeRangeAndFilterUsers({
+                        // just the average of the ageRange; a pretty likely place for user ages to center
+                        setPointAge: (user.ageRange.max-user.ageRange.min)/2,
+                        oldUserArray: potentialPartners,
+                        newUserAmount: ONE_SIDED_POTENTIAL_PARTNER_COUNT
                     })
-                    sideOneAgeRange = newAgeRange
+                    // because this is two-sided:
+                    //  the newSelectionAgeRange (bounds the ages on sideOne) becomes the ageRange on sideTwo
+                    //  the newAgeRange (bounds the age ranges on sideOne) becomes the selectionAgeRange on sideTwo
+                    sideOneSelectionAgeRange = newSelectionAgeRange
+                    sideTwoSelectionAgeRange = newAgeRange
+                    potentialPartners = newUserArray
 
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${TWO_SIDED_POTENTIAL_PARTNER_COUNT} partners for two-sided`)
-                    offset += 10
-                }
-
-                // figure out what the least permissive age range is
-                let leastPermissiveAgeRange = {
-                    min: potentialPartners[0].ageRange.min,
-                    max: potentialPartners[0].ageRange.max}
-                for (let user of potentialPartners) {
-                    if (user.ageRange.min > leastPermissiveAgeRange.min) {
-                        leastPermissiveAgeRange.min = user.ageRange.min
-                    }
-                    if (user.ageRange.max < leastPermissiveAgeRange.max) {
-                        leastPermissiveAgeRange.max = user.ageRange.max
-                    }
+                    offset += 20
                 }
 
                 // TWO-SIDED DATING: Find competitors
@@ -316,11 +385,11 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: user.identity,
                         minScore: group2MinScore,
                         maxScore: group2MaxScore,
-                        searchCount: 10,
+                        searchCount: 20,
                         offset,
                         checkProfileComplete,
-                        ageRange: sideOneAgeRange,
-                        selectionAgeRange: leastPermissiveAgeRange
+                        ageRange: sideOneSelectionAgeRange,
+                        selectionAgeRange: sideTwoSelectionAgeRange
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -340,7 +409,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     // leastPermissiveAgeRange, and ageRange is determined by sideOneAgeRange
 
                     console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${TWO_SIDED_COMPETITOR_COUNT} competitors for two-sided`)
-                    offset += 10
+                    offset += 20
                 }
 
                 return resolve({potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange: leastPermissiveAgeRange})
