@@ -5,6 +5,7 @@ const ROOM_SCORE_STDEV_RANGE = 1      // 1 --> +/- 0.5 stdevs
 const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 const {findClosestGroup} = require("../userGroup/findClosestGroup");
 const {getUserStdev, getGroupScoreRange} = require("../userGroup/getGroupScoreRange");
+const {dateCompetitorFindFunction} = require("./dateCompetitorFindFunction");
 
 const formRoomFunction = (cognitoId) => {
     return new Promise(async (resolve, reject) => {
@@ -77,47 +78,30 @@ const formRoomFunction = (cognitoId) => {
 group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 console.log("FORM-ROOM: searching for dates and competitors")
-                let [dates, competitors] = await Promise.all([
-                    // find dates near these coordinates
-                    // identity and choice are flipped, because we want to find someone who is LOOKING FOR
-                    // the user
-                    UserModel.find(
-                        roomSelectionCriteria(
-                            user, user.identity, choice, otherGroupStdevData.minScore, otherGroupStdevData.maxScore
-                        ))
-                        // gives priorityMode priority, then the last users to queue (smallest value)
-                        .sort({priorityMode: -1, roomEnqueueTime: 1})
-                        .limit(10)
-                        .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
-                        .exec(),
+                let {potentialPartners, competitors} = dateCompetitorFindFunction({
+                    user,
+                    choiceIdentity: choice,
+                    group1MinScore: isOneSided ? userGroupStdevData.minScore : otherGroupStdevData.minScore,
+                    group1MaxScore: isOneSided ? userGroupStdevData.maxScore : otherGroupStdevData.maxScore,
+                    group2MinScore: isOneSided ? otherGroupStdevData.minScore : userGroupStdevData.minScore,
+                    group2MaxScore: isOneSided ? otherGroupStdevData.maxScore : userGroupStdevData.maxScore,
+                    UserModelType: "UserModel",
+                    DateModelType: "DateModel"
+                })
 
-                    // if it's one-sided, competitors=dates
-                    isOneSided ? new Promise((resolve) => resolve([])) :
-
-                    // find competitors near these coordinates
-                    UserModel.find(roomSelectionCriteria(
-                        user, choice, user.identity, userGroupStdevData.minScore, userGroupStdevData.maxScore
-                    ))
-                        // gives priorityMode priority, then the last users to queue (smallest value)
-                        .sort({priorityMode: -1, roomEnqueueTime: 1})
-                        .limit(9)
-                        .select(["_id", "waitingForRoom", "location", "identity", "currentRoom"])
-                        .exec(),
-                ])
-
-                console.log(`FORM-ROOM: completed find; ${dates.length} dates and ${competitors.length} competitors`)
+                console.log(`FORM-ROOM: completed find; ${potentialPartners.length} dates and ${competitors.length} competitors`)
 
                 if (isOneSided) {
-                    if (dates.length < 10) {
+                    if (potentialPartners.length < 10) {
                         console.errors("FORM-ROOM: rejecting due too few dates for one-sided dating")
                         return reject("Not enough dates for one-sided dating")
                     }
                     else {
-                        dates.push(user)
+                        potentialPartners.push(user)
                     }
                 }
                 else {
-                    if (dates.length < 10 || competitors.length < 9) {
+                    if (potentialPartners.length < 10 || competitors.length < 9) {
                         console.error("FORM-ROOM: rejecting due to two few dates or competitors for 2-sided dating")
                         return reject("Too few dates or competitors")
                     }
@@ -130,7 +114,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 let room = new RoomModel({
                     spawningUser: user,
-                    numPeople: dates.length + competitors.length,
+                    numPeople: potentialPartners.length + competitors.length,
                     isSingleSided: isOneSided,
                     sideOne: dates,
                     sideOneIdentity: choice,
@@ -145,9 +129,9 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 room = await room.save()
 
                 // mark dates and competitors as no longer waiting for a room, in this room
-                for (let i = 0; i < dates.length; i++) {
-                    dates[i].waitingForRoom = false
-                    dates[i].currentRoom = room._id
+                for (let i = 0; i < potentialPartners.length; i++) {
+                    potentialPartners[i].waitingForRoom = false
+                    potentialPartners[i].currentRoom = room._id
                 }
                 for (let i = 0; i < competitors.length; i++) {
                     competitors[i].waitingForRoom = false
@@ -156,17 +140,17 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 console.log("FORM-ROOM: Saving dates and competitors as no longer waiting for rooms")
                 // save all dates and competitors
-                await Promise.all([dates, competitors].map(userArray => {
+                await Promise.all([potentialPartners, competitors].map(userArray => {
                     return Promise.all(userArray.map(indUser => {
                         return indUser.save()
                     }))
                 }))
 
                 console.log("FORM-ROOM: Dates and competitors saved")
-                console.log({dates, competitors})
+                console.log({potentialPartners, competitors})
 
                 return resolve({
-                    dates, competitors
+                    potentialPartners, competitors
                 })
             }
         }
