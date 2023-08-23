@@ -2,10 +2,8 @@ function roomSelectionCriteria({user, choice, identity, minScore, maxScore, chec
     let obj = {
         // not the same _id
         _id: {$ne: user._id},
-        // is waiting
-        waitingForRoom: true,
-            // matches beginner value
-            isBeginner: user.isBeginner,
+        // matches new value
+        isNew: user.isNew,
         // is looking for similar dates
         lookingFor: choice,
         shortTerm: user.shortTerm,
@@ -34,7 +32,10 @@ function roomSelectionCriteria({user, choice, identity, minScore, maxScore, chec
     if (checkProfileComplete) {
         // they have completed their profile (added photos...)
         obj["profileComplete"] = true
+        obj["waitingForRoom"] = true
     }
+
+    console.log(obj)
 
     return obj
 }
