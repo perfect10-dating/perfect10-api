@@ -7,6 +7,7 @@ const ONE_SIDED_POTENTIAL_PARTNER_COUNT = 10
 const ONE_SIDED_COMPETITOR_COUNT = 0
 const TWO_SIDED_POTENTIAL_PARTNER_COUNT = 10
 const TWO_SIDED_COMPETITOR_COUNT = 9
+const USERS_TO_GET_PER_PASS = 20
 
 /**
  * Run the query to find user objects
@@ -283,7 +284,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
-                        searchCount: 20,
+                        searchCount: USERS_TO_GET_PER_PASS,
                         offset,
                         checkProfileComplete,
                         ageRange,
@@ -316,7 +317,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     potentialPartners = newUserArray
 
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${ONE_SIDED_POTENTIAL_PARTNER_COUNT} partners for one-sided`)
-                    offset += 20
+                    offset += USERS_TO_GET_PER_PASS
                 }
 
                 return resolve({potentialPartners, competitors, sideOneAgeRange: ageRange})
@@ -336,7 +337,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
-                        searchCount: 20,
+                        searchCount: USERS_TO_GET_PER_PASS,
                         offset,
                         checkProfileComplete,
                         ageRange: {min: user.age, max: user.age},     // NOTE -- this doesn't change (for now),
@@ -371,7 +372,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     potentialPartners = newUserArray
 
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${TWO_SIDED_POTENTIAL_PARTNER_COUNT} partners for two-sided`)
-                    offset += 20
+                    offset += USERS_TO_GET_PER_PASS
                 }
 
                 // TWO-SIDED DATING: Find competitors
@@ -384,7 +385,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         identity: user.identity,
                         minScore: group2MinScore,
                         maxScore: group2MaxScore,
-                        searchCount: 20,
+                        searchCount: USERS_TO_GET_PER_PASS,
                         offset,
                         checkProfileComplete,
                         ageRange: sideOneSelectionAgeRange,
@@ -408,7 +409,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     // leastPermissiveAgeRange, and ageRange is determined by sideOneAgeRange
 
                     console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${TWO_SIDED_COMPETITOR_COUNT} competitors for two-sided`)
-                    offset += 20
+                    offset += USERS_TO_GET_PER_PASS
                 }
 
                 return resolve({potentialPartners, competitors, sideOneAgeRange: sideTwoSelectionAgeRange, sideTwoAgeRange: sideOneSelectionAgeRange})
