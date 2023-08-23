@@ -18,7 +18,8 @@ const cognitoExpress = new CognitoExpress({
 // specify routes that permit unauthenticated access
 const UNAUTHENTICATED_ROUTES = [
     '/create-user',
-    '/generate-random-users'
+    '/generate-random-users',
+    '/form-room-test',
 ]
 
 const ADMIN_ROUTES = []

@@ -8,9 +8,6 @@ module.exports = (router) => {
     router.post('/generate-random-users', async (req, res) => {
         // this is only legal on test environments
         if (!process.env.MONGO_DB) {
-            // set the random generation functions
-            Math.seed(42)
-
             let {userFirstNames, latitude, longitude} = req.body
 
             // only do these two for now
@@ -49,6 +46,9 @@ module.exports = (router) => {
                 console.error(err)
                 return res.status(500).json("An error occurred when generating random users")
             }
+        }
+        else {
+            return res.status(400).json("Nope.")
         }
     })
 }

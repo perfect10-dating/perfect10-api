@@ -173,4 +173,21 @@ module.exports = (router) => {
             return res.status(500).json(err)
         }
     })
+
+    router.post('/form-room-test', async (req, res) => {
+        // this is only legal on test environments
+        if (!process.env.MONGO_DB) {
+            try {
+                let cognitoId = req.body
+
+                await formRoomFunction(cognitoId)
+                return res.status(200).json("Formed a new room")
+            } catch (err) {
+                return res.status(500).json(err)
+            }
+        }
+        else {
+            return res.status(400).json("Nope.")
+        }
+    })
 }
