@@ -21,11 +21,11 @@ const TWO_SIDED_COMPETITOR_COUNT = 9
  * @returns {Promise<*>}
  */
 async function findUserFunction({UserModelObject, user, choice, identity, minScore, maxScore,
-                                    searchCount, offset, checkProfileComplete, ageRange}) {
+                                    searchCount, offset, checkProfileComplete, ageRange, selectionAgeRange}) {
     return UserModelObject.find(
         roomSelectionCriteria(
             {
-                user, choice, identity, minScore, maxScore, checkProfileComplete, ageRange
+                user, choice, identity, minScore, maxScore, checkProfileComplete, ageRange, selectionAgeRange
             }
         ))
         // gives priorityMode priority, then the last users to queue (smallest value)
@@ -212,7 +212,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         searchCount: 10,
                         offset,
                         checkProfileComplete,
-                        ageRange
+                        ageRange,
+                        selectionAgeRange: user.ageRange
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -221,7 +222,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     }
 
                     potentialPartners = potentialPartners.concat(
-                        screenUsers({
+                        await screenUsers({
                             DateModelObject,
                             usersToScreen: newPotentialPartners,
                             screeningUsers: potentialPartners.concat(newPotentialPartners)
@@ -245,7 +246,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
             // TWO-SIDED DATING
             else {
                 // FIND PARTNERS
-                let sideOneAgeRange = {min: user.age, max: user.age}
+                let sideOneAgeRange = {min: 0, max: 0}
+                let sideOneAgeRangeUninit = true
                 let offset = 0
                 while (potentialPartners.length < TWO_SIDED_POTENTIAL_PARTNER_COUNT) {
                     let newPotentialPartners = await findUserFunction({
@@ -257,7 +259,9 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         maxScore: group1MaxScore,
                         searchCount: 10,
                         offset,
-                        checkProfileComplete
+                        checkProfileComplete,
+                        ageRange: {min: user.age, max: user.age},     // NOTE -- this doesn't change (for now),
+                        selectionAgeRange: user.ageRange
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -266,22 +270,39 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     }
 
                     potentialPartners = potentialPartners.concat(
-                        screenUsers({
+                        await screenUsers({
                             DateModelObject,
                             usersToScreen: newPotentialPartners,
                             screeningUsers: [user]
                         })
                     )
+                    if (sideOneAgeRangeUninit && potentialPartners.length > 0) {
+                        sideOneAgeRangeUninit = false
+                        // set this to something possible
+                        sideOneAgeRange = {min: potentialPartners[0].age, max: potentialPartners[0].age}
+                    }
 
-                    // change the age range and filter if needed
-                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
+                    // change the age range but DO NOT FILTER!
+                    const {newAgeRange} = getNewAgeRangeAndFilterUsers({
                         oldMin: sideOneAgeRange.min, oldMax: sideOneAgeRange.max, oldUserArray: potentialPartners
                     })
                     sideOneAgeRange = newAgeRange
-                    potentialPartners = newUserArray
 
                     console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${TWO_SIDED_POTENTIAL_PARTNER_COUNT} partners for two-sided`)
                     offset += 10
+                }
+
+                // figure out what the least permissive age range is
+                let leastPermissiveAgeRange = {
+                    min: potentialPartners[0].ageRange.min,
+                    max: potentialPartners[0].ageRange.max}
+                for (let user of potentialPartners) {
+                    if (user.ageRange.min > leastPermissiveAgeRange.min) {
+                        leastPermissiveAgeRange.min = user.ageRange.min
+                    }
+                    if (user.ageRange.max < leastPermissiveAgeRange.max) {
+                        leastPermissiveAgeRange.max = user.ageRange.max
+                    }
                 }
 
                 // TWO-SIDED DATING: Find competitors
@@ -297,7 +318,9 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         maxScore: group2MaxScore,
                         searchCount: 10,
                         offset,
-                        checkProfileComplete
+                        checkProfileComplete,
+                        ageRange: sideOneAgeRange,
+                        selectionAgeRange: leastPermissiveAgeRange
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -306,24 +329,21 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     }
 
                     competitors = competitors.concat(
-                        screenUsers({
+                        await screenUsers({
                             DateModelObject,
                             usersToScreen: newCompetitors,
                             screeningUsers: potentialPartners
                         })
                     )
 
-                    const {newAgeRange, newUserArray} = getNewAgeRangeAndFilterUsers({
-                        oldMin: sideTwoAgeRange.min, oldMax: sideTwoAgeRange.max, oldUserArray: competitors
-                    })
-                    sideTwoAgeRange = newAgeRange
-                    competitors = newUserArray
+                    // NOTE -- we don't calculate age range here because age selection is already done by
+                    // leastPermissiveAgeRange, and ageRange is determined by sideOneAgeRange
 
                     console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${TWO_SIDED_COMPETITOR_COUNT} competitors for two-sided`)
                     offset += 10
                 }
 
-                return resolve({potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange})
+                return resolve({potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange: leastPermissiveAgeRange})
             }
         }
         catch (err) {

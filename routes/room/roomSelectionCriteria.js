@@ -1,4 +1,16 @@
-function roomSelectionCriteria({user, choice, identity, minScore, maxScore, checkProfileComplete, ageRange}) {
+/**
+ *
+ * @param user
+ * @param choice
+ * @param identity
+ * @param minScore
+ * @param maxScore
+ * @param checkProfileComplete
+ * @param selectionAgeRange       -- age range that age must be between
+ * @param ageRange                -- age range that the user must be more permissive than
+ * @returns {{"ageRange.min": {$lte}, "ageRange.max": {$gte}, shortTerm: *, identity, roomScore: {$gte, $lte}, lookingFor, location: {$near: {$geometry: {coordinates, type: string}, $maxDistance: number}}, _id: {$ne}, isNew: *, age: {$gte, $lte}}}
+ */
+function roomSelectionCriteria({user, choice, identity, minScore, maxScore, checkProfileComplete, selectionAgeRange, ageRange}) {
     let obj = {
         // not the same _id
         _id: {$ne: user._id},
@@ -10,7 +22,7 @@ function roomSelectionCriteria({user, choice, identity, minScore, maxScore, chec
         // the user is looking for them
         identity: identity,
         // in the age range
-        age: {$lte: user.ageRange.max, $gte: user.ageRange.min},
+        age: {$lte: selectionAgeRange.max, $gte: selectionAgeRange.min},
         // they are also less or equally selective than the user
         "ageRange.max": {$gte: ageRange.max},
         "ageRange.min": {$lte: ageRange.min},

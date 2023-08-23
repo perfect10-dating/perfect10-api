@@ -94,9 +94,11 @@ async function replaceUserInRoom(userObject) {
             let workingArray = []
             let scores
             let ageRange
+            let selectionAgeRange
             if (onSideTwo) {
                 scores = room.sideTwoScores
                 ageRange = room.sideTwoAgeRange
+                selectionAgeRange = room.sideOneAgeRange
                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
                     if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideTwo[userIndex])
@@ -107,6 +109,8 @@ async function replaceUserInRoom(userObject) {
             else {
                 scores = room.sideOneScores
                 ageRange = room.sideOneAgeRange
+                // if it's single sided, use SideOne, otherwise use SideTwo
+                selectionAgeRange = room.isSingleSided ? room.sideOneAgeRange : room.sideTwoAgeRange
                 for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
                     if (room.sideOne[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideOne[userIndex])
@@ -120,8 +124,10 @@ async function replaceUserInRoom(userObject) {
 
             // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
             let newUser = await UserModel.findOne(
-                roomSelectionCriteria({user: room.spawningUser, lookingFor: targetLookingFor, identity: targetIdentity,
-                    minScore: scores.min, maxScore: scores.max, checkProfileComplete: true, ageRange})
+                roomSelectionCriteria(
+                    {user: room.spawningUser, lookingFor: targetLookingFor, identity: targetIdentity,
+                    minScore: scores.min, maxScore: scores.max, checkProfileComplete: true, ageRange,
+                    selectionAgeRange})
             )
                 // gives priorityMode priority, then the last users to queue (smallest value)
                 .sort({priorityMode: -1, roomEnqueueTime: 1})
