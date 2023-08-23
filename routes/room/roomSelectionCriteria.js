@@ -1,5 +1,5 @@
-function roomSelectionCriteria(user, choice, identity, minScore, maxScore) {
-    return ({
+function roomSelectionCriteria(user, choice, identity, minScore, maxScore, checkProfileComplete) {
+    let obj = {
         // not the same _id
         _id: {$ne: user._id},
         // is waiting
@@ -29,10 +29,14 @@ function roomSelectionCriteria(user, choice, identity, minScore, maxScore) {
                 }
             }
         },
+    }
 
+    if (checkProfileComplete) {
         // they have completed their profile (added photos...)
-        profileComplete: true,
-    })
+        obj["profileComplete"] = true
+    }
+
+    return obj
 }
 
 module.exports = {roomSelectionCriteria}

@@ -20,10 +20,11 @@ const TWO_SIDED_COMPETITOR_COUNT = 9
  * @param searchCount
  * @returns {Promise<*>}
  */
-async function findUserFunction({UserModelObject, user, choice, identity, minScore, maxScore, searchCount, offset}) {
+async function findUserFunction({UserModelObject, user, choice, identity, minScore, maxScore,
+                                    searchCount, offset, checkProfileComplete}) {
     return UserModelObject.find(
         roomSelectionCriteria(
-            user, choice, identity, minScore, maxScore
+            user, choice, identity, minScore, maxScore, checkProfileComplete
         ))
         // gives priorityMode priority, then the last users to queue (smallest value)
         .sort({priorityMode: -1, roomEnqueueTime: 1})
@@ -132,7 +133,9 @@ async function screenUsers({DateModelObject, usersToScreen, screeningUsers}) {
 async function dateCompetitorFindFunction({user, choiceIdentity,
                                               group1MinScore, group1MaxScore, group2MinScore, group2MaxScore,
                                               // so that we can do test users and dates
-                                              UserModelType, DateModelType
+                                              UserModelType, DateModelType,
+                                              // false only for test cases
+                                              checkProfileComplete
                                           }) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -165,7 +168,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
                         searchCount: 10,
-                        offset
+                        offset,
+                        checkProfileComplete
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -201,7 +205,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         minScore: group1MinScore,
                         maxScore: group1MaxScore,
                         searchCount: 10,
-                        offset
+                        offset,
+                        checkProfileComplete
                     })
 
                     // we can't get enough new partners to fill the criteria
@@ -232,7 +237,8 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         minScore: group2MinScore,
                         maxScore: group2MaxScore,
                         searchCount: 10,
-                        offset
+                        offset,
+                        checkProfileComplete
                     })
 
                     // we can't get enough new partners to fill the criteria

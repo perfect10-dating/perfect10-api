@@ -117,7 +117,7 @@ async function replaceUserInRoom(userObject) {
 
             // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
             let newUser = await UserModel.findOne(
-                roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity, scores.min, scores.max)
+                roomSelectionCriteria(room.spawningUser, targetLookingFor, targetIdentity, scores.min, scores.max, true)
             )
                 // gives priorityMode priority, then the last users to queue (smallest value)
                 .sort({priorityMode: -1, roomEnqueueTime: 1})

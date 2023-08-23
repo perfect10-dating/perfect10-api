@@ -7,7 +7,7 @@ const {findClosestGroup} = require("../userGroup/findClosestGroup");
 const {getUserStdev, getGroupScoreRange} = require("../userGroup/getGroupScoreRange");
 const {dateCompetitorFindFunction} = require("./dateCompetitorFindFunction");
 
-const formRoomFunction = (cognitoId) => {
+const formRoomFunction = (cognitoId, checkProfileComplete) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await UserModel.findOne({cognitoId}).populate({
@@ -22,7 +22,7 @@ const formRoomFunction = (cognitoId) => {
             else {
                 console.log(user)
 
-                if (user.temporarilyLocked || user.mustReviewDate || !user.profileComplete) {
+                if (user.temporarilyLocked || user.mustReviewDate || (!user.profileComplete && checkProfileComplete)) {
                     return reject("User is unsuitable for spawning a new room")
                 }
 
@@ -86,7 +86,8 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     group2MinScore: isOneSided ? otherGroupStdevData.minScore : userGroupStdevData.minScore,
                     group2MaxScore: isOneSided ? otherGroupStdevData.maxScore : userGroupStdevData.maxScore,
                     UserModelType: "UserModel",
-                    DateModelType: "DateModel"
+                    DateModelType: "DateModel",
+                    checkProfileComplete
                 })
 
                 console.log(`FORM-ROOM: completed find; ${potentialPartners.length} dates and ${competitors.length} competitors`)
@@ -167,7 +168,7 @@ module.exports = (router) => {
         try {
             let cognitoId = res.locals.user.sub
 
-            await formRoomFunction(cognitoId)
+            await formRoomFunction(cognitoId, true)
             return res.status(200).json("Formed a new room")
         } catch (err) {
             return res.status(500).json(err)
@@ -178,9 +179,9 @@ module.exports = (router) => {
         // this is only legal on test environments
         if (!process.env.MONGO_DB) {
             try {
-                let cognitoId = req.body
+                let {cognitoId} = req.body
 
-                await formRoomFunction(cognitoId)
+                await formRoomFunction(cognitoId, false)
                 return res.status(200).json("Formed a new room")
             } catch (err) {
                 return res.status(500).json(err)
