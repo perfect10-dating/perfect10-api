@@ -79,7 +79,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
 
                 // ==================== ACTUALLY RUN QUERY FOR USERS ======================================
-                console.log("FORM-ROOM: searching for dates and competitors")
+                console.log("FORM-ROOM: searching for potentialPartners and competitors")
                 let {potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange} = await dateCompetitorFindFunction({
                     user,
                     choiceIdentity: choice,
@@ -92,12 +92,12 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     checkProfileComplete
                 })
 
-                console.log(`FORM-ROOM: completed find; ${potentialPartners.length} dates and ${competitors.length} competitors`)
+                console.log(`FORM-ROOM: completed find; ${potentialPartners.length} potentialPartners and ${competitors.length} competitors`)
 
                 if (isOneSided) {
                     if (potentialPartners.length < 10) {
-                        console.errors("FORM-ROOM: rejecting due too few dates for one-sided dating")
-                        return reject("Not enough dates for one-sided dating")
+                        console.error("FORM-ROOM: rejecting due too few potentialPartners for one-sided dating")
+                        return reject("Not enough potentialPartners for one-sided dating")
                     }
                     else {
                         potentialPartners.push(user)
@@ -105,8 +105,8 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 }
                 else {
                     if (potentialPartners.length < 10 || competitors.length < 9) {
-                        console.error("FORM-ROOM: rejecting due to two few dates or competitors for 2-sided dating")
-                        return reject("Too few dates or competitors")
+                        console.error("FORM-ROOM: rejecting due to two few potentialPartners or competitors for 2-sided dating")
+                        return reject("Too few potentialPartners or competitors")
                     }
                     else {
                         competitors.push(user)
@@ -119,7 +119,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     spawningUser: user,
                     numPeople: potentialPartners.length + competitors.length,
                     isSingleSided: isOneSided,
-                    sideOne: dates,
+                    sideOne: potentialPartners,
                     sideOneIdentity: choice,
                     sideOneScores: {min: otherGroupStdevData.minScore, max: otherGroupStdevData.maxScore},
                     sideOneAgeRange,
@@ -133,7 +133,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 // save this new room
                 room = await room.save()
 
-                // mark dates and competitors as no longer waiting for a room, in this room
+                // mark potentialPartners and competitors as no longer waiting for a room, in this room
                 for (let i = 0; i < potentialPartners.length; i++) {
                     potentialPartners[i].waitingForRoom = false
                     potentialPartners[i].currentRoom = room._id
@@ -143,15 +143,15 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     competitors[i].currentRoom = room._id
                 }
 
-                console.log("FORM-ROOM: Saving dates and competitors as no longer waiting for rooms")
-                // save all dates and competitors
+                console.log("FORM-ROOM: Saving potentialPartners and competitors as no longer waiting for rooms")
+                // save all potentialPartners and competitors
                 await Promise.all([potentialPartners, competitors].map(userArray => {
                     return Promise.all(userArray.map(indUser => {
                         return indUser.save()
                     }))
                 }))
 
-                console.log("FORM-ROOM: Dates and competitors saved")
+                console.log("FORM-ROOM: PotentialPartners and competitors saved")
                 console.log({potentialPartners, competitors})
 
                 return resolve({
