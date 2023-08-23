@@ -393,7 +393,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
                     // we can't get enough new partners to fill the criteria
                     if (newCompetitors.length < (TWO_SIDED_COMPETITOR_COUNT-competitors.length)) {
-                        return reject(`Two-sided dating room generation failed: not enough eligible competitors (found ${competitors.length}`)
+                        return reject(`Two-sided dating room generation failed: not enough eligible competitors (found ${newCompetitors.length})`)
                     }
 
                     competitors = competitors.concat(
