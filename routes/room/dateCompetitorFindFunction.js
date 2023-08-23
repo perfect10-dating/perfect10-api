@@ -375,7 +375,6 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                 }
 
                 // TWO-SIDED DATING: Find competitors
-                let sideTwoAgeRange = {min: user.age, max: user.age}
                 offset = 0
                 while (competitors.length < TWO_SIDED_COMPETITOR_COUNT) {
                     let newCompetitors = await findUserFunction({
@@ -394,7 +393,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
                     // we can't get enough new partners to fill the criteria
                     if (newCompetitors.length < (TWO_SIDED_COMPETITOR_COUNT-competitors.length)) {
-                        return reject(`Two-sided dating room generation failed: not enough eligible partners (found ${competitors.length}`)
+                        return reject(`Two-sided dating room generation failed: not enough eligible competitors (found ${competitors.length}`)
                     }
 
                     competitors = competitors.concat(
@@ -412,7 +411,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     offset += 20
                 }
 
-                return resolve({potentialPartners, competitors, sideOneAgeRange, sideTwoAgeRange: leastPermissiveAgeRange})
+                return resolve({potentialPartners, competitors, sideOneAgeRange: sideTwoSelectionAgeRange, sideTwoAgeRange: sideOneSelectionAgeRange})
             }
         }
         catch (err) {
