@@ -174,7 +174,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
                     // we can't get enough new partners to fill the criteria
                     if (newPotentialPartners.length < (ONE_SIDED_POTENTIAL_PARTNER_COUNT-potentialPartners.length)) {
-                        return reject("One-sided dating room generation failed: not enough eligible partners")
+                        return reject(`One-sided dating room generation failed: not enough eligible partners (found ${newPotentialPartners.length})`)
                     }
 
                     potentialPartners = potentialPartners.concat(
@@ -211,7 +211,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
                     // we can't get enough new partners to fill the criteria
                     if (newPotentialPartners.length < (TWO_SIDED_POTENTIAL_PARTNER_COUNT-potentialPartners.length)) {
-                        return reject("Two-sided dating room generation failed: not enough eligible partners")
+                        return reject(`Two-sided dating room generation failed: not enough eligible partners (found ${newPotentialPartners.length}`)
                     }
 
                     potentialPartners = potentialPartners.concat(
@@ -243,7 +243,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
 
                     // we can't get enough new partners to fill the criteria
                     if (newCompetitors.length < (TWO_SIDED_COMPETITOR_COUNT-competitors.length)) {
-                        return reject("Two-sided dating room generation failed: not enough eligible partners")
+                        return reject(`Two-sided dating room generation failed: not enough eligible partners (found ${competitors.length}`)
                     }
 
                     competitors = competitors.concat(

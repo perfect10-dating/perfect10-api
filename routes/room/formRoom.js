@@ -78,7 +78,7 @@ const formRoomFunction = (cognitoId, checkProfileComplete) => {
 group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 console.log("FORM-ROOM: searching for dates and competitors")
-                let {potentialPartners, competitors} = dateCompetitorFindFunction({
+                let {potentialPartners, competitors} = await dateCompetitorFindFunction({
                     user,
                     choiceIdentity: choice,
                     group1MinScore: isOneSided ? userGroupStdevData.minScore : otherGroupStdevData.minScore,
