@@ -17,6 +17,10 @@ module.exports = (router) => {
             let unixBirthDate = (new Date(user.dateOfBirth)).getTime()
             user.age = Math.floor((Date.now() - unixBirthDate) / (1000 * 60 * 60 * 24 * 365))
 
+            if (ageRange && (user.age > ageRange.max || user.age < ageRange.min)) {
+                return res.status(400).json("Your age range must include your own age")
+            }
+
             user.lookingFor = lookingFor || user.lookingFor
             user.lastName = lastName || user.lastName
             user.shortTerm = (shortTerm === undefined) ? user.shortTerm : shortTerm
