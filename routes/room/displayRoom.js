@@ -4,6 +4,7 @@ Views any dates that you or other users proposed
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {userInDate} = require("../date/userInDate");
+const {calculateDistanceBetweenCoords} = require("./calculateDistanceBetweenCoords");
 module.exports = (router) => {
     router.get('/display-room', async (req, res) => {
         try {
@@ -15,16 +16,16 @@ module.exports = (router) => {
 
             // get your own ID, populating both sides of your room (which will be returned for you to view)
             let user = await UserModel.findOne({cognitoId})
-                .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom"])
+                .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom", "location"])
                 .populate({
                     path: "currentRoom",
                     select: ["sideOne", "sideOneIdentity", "sideTwo", "sideTwoIdentity"],
                     populate: [{
                         path: "sideOne",
-                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks"]
+                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks", "shortTerm"]
                     }, {
                         path: "sideTwo",
-                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks"]
+                        select: ["_id", "firstName", "identity", "age", "location", "photoLinks", "shortTerm"]
                     }]
                 })
                 .lean().exec()
@@ -42,8 +43,19 @@ module.exports = (router) => {
 
             let idArray = []
             for (let userGroup of [user.currentRoom.sideOne, user.currentRoom.sideTwo]) {
-                for (let user of userGroup) {
-                    idArray.push(user._id)
+                for (let userObj of userGroup) {
+                    // for date collection
+                    idArray.push(userObj._id)
+                    // calculate the distance to that user
+                    userObj.distance = Math.round(calculateDistanceBetweenCoords({
+                        longitude: user.location.coordinates[0],
+                        latitude: user.location.coordinates[1],
+                    }, {
+                        longitude: userObj.location.coordinates[0],
+                        latitude: userObj.location.coordinates[1],
+                    }))
+                    // clear the location field to prevent stalking
+                    userObj.location = undefined
                 }
             }
 

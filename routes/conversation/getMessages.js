@@ -19,8 +19,11 @@ module.exports = (router) => {
 
           // use the same code as in displayRoom
           let conversations = await ConversationModel.find({
-              users: {$all: [user._id, otherUserId]},
+              users: {$all: [user._id+"", otherUserId+""]},
           }).select("_id").lean().exec()
+
+          console.log(user._id, otherUserId)
+          console.log(conversations)
 
           if (conversations.length === 0) {
               console.log("GET-MESSAGES: no conversations found between these two users")
