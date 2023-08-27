@@ -4,13 +4,16 @@
  * @param userId
  */
 function userInDate(date, userId) {
-    let setupResponsibleUserId = date.setupResponsibleUser._id
-    if (!setupResponsibleUserId) {
-        setupResponsibleUserId = date.setupResponsibleUser
+    if (date.setupResponsibleUser) {
+        let setupResponsibleUserId = date.setupResponsibleUser._id
+        if (!setupResponsibleUserId) {
+            setupResponsibleUserId = date.setupResponsibleUser
+        }
+        if (userId+"" === setupResponsibleUserId+"") {
+            return true
+        }
     }
-    if (userId+"" === setupResponsibleUserId+"") {
-        return true
-    }
+
     for (let userInArr of date.users) {
         let userIdInArr = userInArr._id
         if (!userIdInArr) {
