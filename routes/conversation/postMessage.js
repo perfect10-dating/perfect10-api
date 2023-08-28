@@ -29,7 +29,11 @@ module.exports = (router) => {
             // no conversation exists yet
             let conversation
             if (!conversationId || conversationId === "") {
-                let conversationTemp = new ConversationModel({users: [user._id, otherUserId]})
+                let conversationTemp = new ConversationModel({
+                    users: [user._id, otherUserId],
+                    user0Read: true,
+                    user1Read: false,      // the other user has not read the message
+                })
                 conversation = await conversationTemp.save()
             }
             else {
@@ -37,6 +41,13 @@ module.exports = (router) => {
                 conversation = await ConversationModel.findOne({users: user._id, _id: conversationId}).lean().exec()
                 if (!conversation) {
                     return res.status(404).json("Unable to find a conversation that you are in with this ID")
+                }
+                // the other user has not yet read the new message in this conversation
+                if (conversation.users[0]+"" === user._id+"") {
+                    conversation.user1Read = false
+                }
+                else {
+                    conversation.user0Read = false
                 }
             }
 
