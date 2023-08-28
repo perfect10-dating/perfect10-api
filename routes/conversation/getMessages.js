@@ -52,6 +52,7 @@ module.exports = (router) => {
               else {
                   workingConversation.user1Read = true
               }
+              await workingConversation.save()
 
               return res.status(200).json(sortedMessages)
           }
