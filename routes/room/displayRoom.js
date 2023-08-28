@@ -5,6 +5,7 @@ const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {userInDate} = require("../date/userInDate");
 const {calculateDistanceBetweenCoords} = require("./calculateDistanceBetweenCoords");
+const ConversationModel = require("../../models/ConversationModel");
 module.exports = (router) => {
     router.get('/display-room', async (req, res) => {
         try {
@@ -59,6 +60,7 @@ module.exports = (router) => {
                 }
             }
 
+            // ============================ BEGIN: Getting dates ===========================
             /**
              * https://stackoverflow.com/questions/49554129/mongoose-find-all-documents-with-array-field-which-is-included-in-another-array
              *
@@ -110,7 +112,31 @@ module.exports = (router) => {
                 }
             }
 
-            return res.status(200).json({room: user.currentRoom, dates: datesPruned})
+            // ====================== BEGIN: getting conversations ======================/
+            // this is exactly the same as dates, but without post-processing
+            let conversations = await ConversationModel.aggregate([
+                {
+                    $addFields: {
+                        matchingElements: { $setIntersection: [ idArray, "$users" ] }
+                    }
+                },
+                {
+                    $redact: {
+                        $cond: {
+                            if: { $eq: [ { $size: "$users" }, { $size: "$matchingElements" } ] },
+                            then: "$$KEEP",
+                            else: "$$PRUNE"
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        matchingElements: 0
+                    }
+                }
+            ])
+
+            return res.status(200).json({room: user.currentRoom, dates: datesPruned, conversations})
         } catch (err) {
             console.error(err)
             return res.status(500).json(err)
