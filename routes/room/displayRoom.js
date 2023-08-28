@@ -17,7 +17,7 @@ module.exports = (router) => {
 
             // get your own ID, populating both sides of your room (which will be returned for you to view)
             let user = await UserModel.findOne({cognitoId})
-                .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom", "location"])
+                .select(["_id", "isTemporarilyLocked", "mustReviewDate", "currentRoom", "location", "identity"])
                 .populate({
                     path: "currentRoom",
                     select: ["sideOne", "sideOneIdentity", "sideTwo", "sideTwoIdentity"],
@@ -42,11 +42,11 @@ module.exports = (router) => {
                 return res.status(500).json("User is not in a room")
             }
 
-            let idArray = []
+            let dateUserIdArray = []
             for (let userGroup of [user.currentRoom.sideOne, user.currentRoom.sideTwo]) {
                 for (let userObj of userGroup) {
                     // for date collection
-                    idArray.push(userObj._id)
+                    dateUserIdArray.push(userObj._id)
                     // calculate the distance to that user
                     userObj.distance = Math.round(calculateDistanceBetweenCoords({
                         longitude: user.location.coordinates[0],
@@ -70,7 +70,7 @@ module.exports = (router) => {
             let dates = await DateModel.aggregate([
                 {
                     $addFields: {
-                        matchingElements: { $setIntersection: [ idArray, "$users" ] }
+                        matchingElements: { $setIntersection: [ dateUserIdArray, "$users" ] }
                     }
                 },
                 {
@@ -103,7 +103,7 @@ module.exports = (router) => {
                 }
                 else {
                     // setups from within the group are valid
-                    for (let id of idArray) {
+                    for (let id of dateUserIdArray) {
                         if (id + "" === date.setupResponsibleUser + "") {
                             datesPruned.push(date)
                             break
@@ -113,28 +113,10 @@ module.exports = (router) => {
             }
 
             // ====================== BEGIN: getting conversations ======================/
-            // this is exactly the same as dates, but without post-processing
-            let conversations = await ConversationModel.aggregate([
-                {
-                    $addFields: {
-                        matchingElements: { $setIntersection: [ idArray, "$users" ] }
-                    }
-                },
-                {
-                    $redact: {
-                        $cond: {
-                            if: { $eq: [ { $size: "$users" }, { $size: "$matchingElements" } ] },
-                            then: "$$KEEP",
-                            else: "$$PRUNE"
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        matchingElements: 0
-                    }
-                }
-            ])
+            let conversations = await ConversationModel.find({$and: [
+                    {users: user._id},
+                    {users: {$in: dateUserIdArray.filter(id => id+"" !== user._id+"")}}
+                ]}).lean().exec()
 
             return res.status(200).json({room: user.currentRoom, dates: datesPruned, conversations})
         } catch (err) {
