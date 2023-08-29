@@ -3,10 +3,14 @@ const UserModel = require("../../models/UserModel");
 const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 const DateModel = require("../../models/DateModel");
 
-const ONE_SIDED_POTENTIAL_PARTNER_COUNT = 10
+// const ONE_SIDED_POTENTIAL_PARTNER_COUNT = 10
+// const ONE_SIDED_COMPETITOR_COUNT = 0
+// const TWO_SIDED_POTENTIAL_PARTNER_COUNT = 10
+// const TWO_SIDED_COMPETITOR_COUNT = 9
+const ONE_SIDED_POTENTIAL_PARTNER_COUNT = 6
 const ONE_SIDED_COMPETITOR_COUNT = 0
-const TWO_SIDED_POTENTIAL_PARTNER_COUNT = 10
-const TWO_SIDED_COMPETITOR_COUNT = 9
+const TWO_SIDED_POTENTIAL_PARTNER_COUNT = 6
+const TWO_SIDED_COMPETITOR_COUNT = 5
 const USERS_TO_GET_PER_PASS = 20
 
 /**
