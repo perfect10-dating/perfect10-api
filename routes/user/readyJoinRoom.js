@@ -13,7 +13,7 @@ module.exports = (router) => {
         try {
             let user = await UserModel.findOne({cognitoId}).select(
                 ["unlockTime", "temporarilyLocked", "waitingForRoom", "roomEnqueueTime", "priorityMode",
-                    "priorityModeExpiryTime"
+                    "priorityModeExpiryTime", "currentRoom"
                 ]).exec()
 
             if (!user) {
@@ -25,8 +25,13 @@ module.exports = (router) => {
                 console.error("READY-JOIN-ROOM: This user can't join a room yet")
                 return res.status(200).json("This user can't join a room yet")
             }
+            else if (user.currentRoom) {
+                console.error("READY-JOIN-ROOM: This user is already in a room")
+                return res.status(200).json("This user is already in a room")
+            }
             else {
                 user.waitingForRoom = true
+                user.currentRoom = undefined
                 user.roomEnqueueTime = Date.now()
                 // unsets PriorityMode if the user has passed
                 // if they enter the queue and then priorityMode expires, they keep that status into the next room
