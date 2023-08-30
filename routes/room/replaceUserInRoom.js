@@ -147,8 +147,8 @@ async function replaceUserInRoom(userObject) {
             room.sideTwoScores = getNewScoreRange(room.sideTwoScores, room.sideTwo)
 
             // change the room lengths so we can add people in later
-            room.sideOneLength = room.sideOne.length
-            room.sideTwoLength = room.sideTwo.length
+            room.sideOneSize = room.sideOne.length
+            room.sideTwoSize = room.sideTwo.length
 
             // temporarily save the room -- the original user will have left even if we have an error later
             room = await room.save()
@@ -175,7 +175,10 @@ async function replaceUserInRoom(userObject) {
 
             // next, get the dates these people went on with those on opposingArray
             let screenedUsers = await screenUsers({
-                DateModelObject: Date, usersToScreen: newUsers, screeningUsers: opposingArray, allowNonEmpty: false})
+                DateModelObject: Date,
+                usersToScreen: newUsers,
+                screeningUsers: opposingArray.map(id => {return {_id}}),
+                allowNonEmpty: false})
 
             let newUser = screenedUsers[0]
             if (!newUser) {
