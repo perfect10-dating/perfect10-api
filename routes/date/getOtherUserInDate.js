@@ -2,13 +2,16 @@
  * Returns the ID, or user object, of the other user in the date
  */
 function getOtherUserInDate(date, userId) {
-    let setupResponsibleUserId = date.setupResponsibleUser._id
-    if (!setupResponsibleUserId) {
-        setupResponsibleUserId = date.setupResponsibleUser
+    if (date.setupResponsibleUser) {
+        let setupResponsibleUserId = date.setupResponsibleUser._id
+        if (!setupResponsibleUserId) {
+            setupResponsibleUserId = date.setupResponsibleUser
+        }
+        if (userId+"" !== setupResponsibleUserId+"") {
+            return date.setupResponsibleUser
+        }
     }
-    if (userId+"" !== setupResponsibleUserId+"") {
-        return date.setupResponsibleUser
-    }
+
     for (let userInArr of date.users) {
         let userIdInArr = userInArr._id
         if (!userIdInArr) {
@@ -20,3 +23,5 @@ function getOtherUserInDate(date, userId) {
         }
     }
 }
+
+module.exports = {getOtherUserInDate}

@@ -5,6 +5,7 @@ Either party may reject a date until both parties agree to it
 const UserModel = require("../../models/UserModel");
 const DateModel = require("../../models/DateModel");
 const {userInDate} = require("./userInDate");
+const {getOtherUserInDate} = require("./getOtherUserInDate");
 module.exports = (router) => {
     router.post('/accept-date', async (req, res) => {
         try {
@@ -38,7 +39,7 @@ module.exports = (router) => {
 
             // checks to see if the other person has accepted another date
             let otherUserInDate = getOtherUserInDate(date, user._id)
-            if (otherUserInDate || otherUserInDate.mustReviewDate) {
+            if (otherUserInDate && otherUserInDate.mustReviewDate) {
                 return res.status(500).json("This user is no longer available")
             }
 
@@ -60,7 +61,8 @@ module.exports = (router) => {
 
             return res.status(200).json("Date accepted")
         } catch (err) {
-            return res.status(500).json(err)
+            console.error(err)
+            return res.status(500).json("An error occurred when trying to accept this date")
         }
     })
 }
