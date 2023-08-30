@@ -1,0 +1,8 @@
+const appConfiguration = {
+    ONE_SIDED_POTENTIAL_PARTNER_COUNT: 6,
+    ONE_SIDED_COMPETITOR_COUNT: 0,
+    TWO_SIDED_POTENTIAL_PARTNER_COUNT: 6,
+    TWO_SIDED_COMPETITOR_COUNT: 5,
+}
+
+module.exports = {appConfiguration}

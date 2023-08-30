@@ -8,12 +8,23 @@
  * @param checkProfileComplete
  * @param selectionAgeRange       -- age range that age must be between
  * @param ageRange                -- age range that the user must be more permissive than
+ * @param bannedUsers             -- OPTIONAL: the list of users that are not allowed
  * @returns {{"ageRange.min": {$lte}, "ageRange.max": {$gte}, shortTerm: *, identity, roomScore: {$gte, $lte}, lookingFor, location: {$near: {$geometry: {coordinates, type: string}, $maxDistance: number}}, _id: {$ne}, isNew: *, age: {$gte, $lte}}}
  */
-function roomSelectionCriteria({user, choice, identity, minScore, maxScore, checkProfileComplete, selectionAgeRange, ageRange}) {
+function roomSelectionCriteria({
+                                   user,
+                                   choice,
+                                   identity,
+                                   minScore,
+                                   maxScore,
+                                   checkProfileComplete,
+                                   selectionAgeRange,
+                                   ageRange,
+                                   bannedUsers,
+}) {
     let obj = {
-        // not the same _id
-        _id: {$ne: user._id},
+        // not the same _id, or in bannedUsers
+        _id: {$nin: bannedUsers ? bannedUsers.concat([user._id]) : [user._id]},
         // matches new value
         isNew: user.isNew,
         // is looking for similar dates

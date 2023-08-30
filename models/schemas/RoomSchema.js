@@ -32,6 +32,9 @@ const RoomSchema = new mongoose.Schema({
   // the age range for Side 2
   sideTwoAgeRange: {min: Number, max: Number},
 
+  // the users that we DO NOT allow back into the room (they swapped out)
+  bannedUserList: [{type: ObjectId, ref: 'user', required: true}],
+
 }, {timestamps: true})
 
 module.exports = RoomSchema

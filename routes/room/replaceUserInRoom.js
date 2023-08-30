@@ -4,6 +4,8 @@
 const RoomModel = require("../../models/RoomModel");
 const {roomSelectionCriteria} = require("./roomSelectionCriteria");
 const UserModel = require("../../models/UserModel");
+const {screenUsers} = require("./dateCompetitorFindFunction");
+const DateModel = require("../../models/DateModel");
 
 /*
 NOTE: expects a user with currentRoom field that has not had lean() called.
@@ -90,15 +92,20 @@ async function replaceUserInRoom(userObject) {
             let targetIdentity = onSideTwo ? room.sideTwoIdentity : room.sideOneIdentity
             let targetLookingFor = onSideTwo ? room.sideOneIdentity : room.sideTwoIdentity
 
+            // don't allow this user to be swapped back into the room later
+            room.bannedUserList.push(userObject._id)
+
             // depending on what side we're on, find the user and remove them from that side
             let workingArray = []
             let scores
             let ageRange
             let selectionAgeRange
+            let opposingArray
             if (onSideTwo) {
                 scores = room.sideTwoScores
                 ageRange = room.sideTwoAgeRange
                 selectionAgeRange = room.sideOneAgeRange
+                opposingArray = room.sideOne
                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
                     if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
                         workingArray.push(room.sideTwo[userIndex])
@@ -116,26 +123,43 @@ async function replaceUserInRoom(userObject) {
                         workingArray.push(room.sideOne[userIndex])
                     }
                 }
+                opposingArray = room.isSingleSided ? workingArray : room.sideTwo
                 room.sideOne = workingArray
             }
 
             // temporarily save the room -- the original user will have left even if we have an error later
             await room.save()
 
-            // Now the interesting part -- find a person that we'll slot onto the end of the workingArray
-            let newUser = await UserModel.findOne(
+            // Now the interesting part -- find a set of people that may work in this room
+            let newUsers = await UserModel.findOne(
                 roomSelectionCriteria(
-                    {user: room.spawningUser, lookingFor: targetLookingFor, identity: targetIdentity,
-                    minScore: scores.min, maxScore: scores.max, checkProfileComplete: true, ageRange,
-                    selectionAgeRange})
+                    {
+                        user: room.spawningUser,
+                        choice: targetLookingFor,
+                        identity: targetIdentity,
+                        minScore: scores.min, maxScore: scores.max,
+                        checkProfileComplete: true,
+                        ageRange,
+                        selectionAgeRange,
+                        bannedUsers: room.bannedUsers || []
+                    })
             )
                 // gives priorityMode priority, then the last users to queue (smallest value)
                 .sort({priorityMode: -1, roomEnqueueTime: 1})
+                .limit(20)
                 .select(["_id", "waitingForRoom", "currentRoom"])
                 .exec()
 
+            // next, get the dates these people went on with those on opposingArray
+            let screenedUsers = await screenUsers({
+                DateModelObject: Date, usersToScreen: newUsers, screeningUsers: opposingArray, allowNonEmpty: false})
+
+            let newUser = screenedUsers[0]
             if (!newUser) {
-                return reject("Could not find a suitable user to replace original in room swap")
+                console.error("Could not find a suitable user to replace original in room swap")
+                // we resolve because we'll be able to replace the original user later
+                // as more people join
+                resolve()
             }
             newUser.waitingForRoom = false
             newUser.currentRoom = room._id

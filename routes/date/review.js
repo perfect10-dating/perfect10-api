@@ -3,7 +3,7 @@ This route allows the user to write a date review for another user
  */
 const UserModel = require("../../models/UserModel");
 const DateReviewModel = require("../../models/DateReviewModel");
-const {removeUserFromRoom} = require("../room/replaceUserInRoom");
+const {removeUserFromRoom, replaceUserInRoom} = require("../room/replaceUserInRoom");
 const {generateScore} = require("./generateScore");
 const {rescoreGroup} = require("../userGroup/rescoreGroup");
 module.exports = (router) => {
@@ -72,7 +72,7 @@ module.exports = (router) => {
             await user.save()
 
             // swap yourself out of your old room and allow yourself to choose to join a new one
-            await removeUserFromRoom(user)
+            await replaceUserInRoom(user)
             user.currentRoom = null
             await user.save()
             console.log("DATE-REVIEW: Swapped reviewing user out of room")
