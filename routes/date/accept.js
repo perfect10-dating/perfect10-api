@@ -44,7 +44,7 @@ module.exports = (router) => {
             }
 
             // accepts and saves the date
-            date.accepted = true
+            date.isAccepted = true
             await date.save()
 
             // marks users as committed to this date; they are restricted in operations until they review it
