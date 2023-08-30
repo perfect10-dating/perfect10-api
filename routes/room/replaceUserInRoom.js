@@ -2,7 +2,7 @@
 // (this SHOULD be only one room)
 // then remove them from the room and swap in a suitable alternative
 const RoomModel = require("../../models/RoomModel");
-const {roomSelectionCriteria} = require("./roomSelectionCriteria");
+const {roomSelectionCriteria} = require("./roomUserSelectionCriteria");
 const UserModel = require("../../models/UserModel");
 const {screenUsers} = require("./dateCompetitorFindFunction");
 const DateModel = require("../../models/DateModel");

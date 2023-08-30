@@ -1,6 +1,6 @@
 
 const UserModel = require("../../models/UserModel");
-const {roomSelectionCriteria} = require("./roomSelectionCriteria");
+const {roomSelectionCriteria} = require("./roomUserSelectionCriteria");
 const DateModel = require("../../models/DateModel");
 const {appConfiguration} = require("../../appConfiguration");
 

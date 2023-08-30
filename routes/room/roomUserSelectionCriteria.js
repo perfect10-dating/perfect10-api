@@ -11,7 +11,7 @@
  * @param bannedUsers             -- OPTIONAL: the list of users that are not allowed
  * @returns {{"ageRange.min": {$lte}, "ageRange.max": {$gte}, shortTerm: *, identity, roomScore: {$gte, $lte}, lookingFor, location: {$near: {$geometry: {coordinates, type: string}, $maxDistance: number}}, _id: {$ne}, isNew: *, age: {$gte, $lte}}}
  */
-function roomSelectionCriteria({
+function roomUserSelectionCriteria({
                                    user,
                                    choice,
                                    identity,
@@ -61,4 +61,4 @@ function roomSelectionCriteria({
     return obj
 }
 
-module.exports = {roomSelectionCriteria}
+module.exports = {roomSelectionCriteria: roomUserSelectionCriteria}

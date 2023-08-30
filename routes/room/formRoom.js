@@ -2,7 +2,7 @@ const UserModel = require("../../models/UserModel");
 const RoomModel = require("../../models/RoomModel");
 
 const ROOM_SCORE_STDEV_RANGE = 1      // 1 --> +/- 0.5 stdevs
-const {roomSelectionCriteria} = require("./roomSelectionCriteria");
+const {roomSelectionCriteria} = require("./roomUserSelectionCriteria");
 const {findClosestGroup} = require("../userGroup/findClosestGroup");
 const {getUserStdev, getGroupScoreRange} = require("../userGroup/getGroupScoreRange");
 const {dateCompetitorFindFunction} = require("./dateCompetitorFindFunction");
