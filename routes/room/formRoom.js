@@ -119,14 +119,18 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                     spawningUser: user,
                     numPeople: potentialPartners.length + competitors.length,
                     isSingleSided: isOneSided,
+
                     sideOne: potentialPartners,
                     sideOneIdentity: choice,
                     sideOneScores: {min: otherGroupStdevData.minScore, max: otherGroupStdevData.maxScore},
                     sideOneAgeRange,
+                    sideOneSize: potentialPartners.length,
+
                     sideTwo: competitors,
                     sideTwoIdentity: user.identity,
                     sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
                     sideTwoAgeRange,
+                    sideTwoSize: competitors.length
                 })
 
                 console.log("FORM-ROOM: Saving room")

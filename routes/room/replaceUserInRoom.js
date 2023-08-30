@@ -79,6 +79,21 @@ async function removeUserFromRoom(userObject) {
     })
 }
 
+/**
+ * Gets the new score range for a room
+ * @param oldRange
+ * @param users
+ */
+function getNewScoreRange(oldRange, users) {
+    const spread = (oldRange.max - oldRange.min) / 2
+    let sum = 0
+    for (let user of users) {
+        sum += user.roomScore
+    }
+    let average = sum / (users.length || 1)
+    return {min: average-spread, max: average+spread}
+}
+
 /*
 Removes the user from a room and DOES replace them
 (this occurs when the user opts to swap themselves out, due to distance, inactivity or lack of interest)
@@ -127,8 +142,16 @@ async function replaceUserInRoom(userObject) {
                 room.sideOne = workingArray
             }
 
+            // rescore the room based on the people currently in it
+            room.sideOneScores = getNewScoreRange(room.sideOneScores, room.sideOne)
+            room.sideTwoScores = getNewScoreRange(room.sideTwoScores, room.sideTwo)
+
+            // change the room lengths so we can add people in later
+            room.sideOneLength = room.sideOne.length
+            room.sideTwoLength = room.sideTwo.length
+
             // temporarily save the room -- the original user will have left even if we have an error later
-            await room.save()
+            room = await room.save()
 
             // Now the interesting part -- find a set of people that may work in this room
             let newUsers = await UserModel.findOne(
@@ -165,6 +188,9 @@ async function replaceUserInRoom(userObject) {
             newUser.currentRoom = room._id
 
             workingArray.push(newUser)
+
+            room.sideOneLength = room.sideOne.length
+            room.sideTwoLength = room.sideTwo.length
 
             // now re-save
             await room.save()
