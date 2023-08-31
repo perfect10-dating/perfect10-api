@@ -32,7 +32,7 @@ async function findRoomsWithUsers(userObject, additionalParameters) {
                 console.error("The user is not in a room")
                 reject("No room")
             }
-            let onSideTwo = userObject.identity === room.sideTwoIdentity
+            let onSideTwo = userObject.identity !== room.sideOneIdentity
             resolve({room, onSideTwo: onSideTwo})
         }
         catch (err) {
@@ -139,6 +139,8 @@ async function replaceUserInRoom(userObject) {
                 opposingArray = room.isSingleSided ? workingArray : room.sideTwo
                 room.sideOne = workingArray
             }
+            console.log(onSideTwo)
+            console.log(workingArray)
 
             // rescore the room based on the people currently in it
             room.sideOneScores = getNewScoreRange(room.sideOneScores, room.sideOne)
