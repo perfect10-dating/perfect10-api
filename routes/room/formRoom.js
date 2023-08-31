@@ -185,6 +185,7 @@ module.exports = (router) => {
             // if that fails, try adding the user to an existing room
             try {
                 await findExistingRoomForUser(user)
+                return res.status(200).json("Found existing room")
             }
             catch (err) {
                 console.error(err)
