@@ -11,7 +11,18 @@ import DateModel from "../../models/DateModel";
  */
 function roomSelection(userObject) {
     return RoomModel.findOne({
+        location: {
+            $near: {
+                // convert distance in miles to meters, measure only radially
+                $maxDistance: (userObject.maxDistance / 2) * 1609,
+                $geometry: {
+                    type: "Point",
+                    coordinates: userObject.location.coordinates
+                }
+            }
+        },
         $or: [
+
             // Side 1 Criteria (one-sided dating)
             {
                 sideOneIdentity: {$and: [{$eq: userObject.identity}, {$eq: userObject.lookingFor}]},
@@ -58,16 +69,6 @@ function roomSelection(userObject) {
             }
         ],
         bannedUserList: {$ne: userObject._id},
-        location: {
-            $near: {
-                // convert distance in miles to meters, measure only radially
-                $maxDistance: (userObject.maxDistance / 2) * 1609,
-                $geometry: {
-                    type: "Point",
-                    coordinates: userObject.location.coordinates
-                }
-            }
-        },
     }).exec()
 }
 
