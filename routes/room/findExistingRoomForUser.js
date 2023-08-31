@@ -10,7 +10,7 @@ const DateModel = require("../../models/DateModel");
  * @returns {*}
  */
 function roomSelection(userObject) {
-    return RoomModel.findOne({
+    return RoomModel.find({
         location: {
             $near: {
                 // convert distance in miles to meters, measure only radially
@@ -25,51 +25,51 @@ function roomSelection(userObject) {
 
             // Side 1 Criteria (one-sided dating)
             {
-                sideOneIdentity: {$and: [{$eq: userObject.identity}, {$eq: userObject.lookingFor}]},
+                $and: [{sideOneIdentity: userObject.identity}, {sideOneIdentity: userObject.lookingFor}],
                 // check scores
-                "sideOneScores.min": {$le: userObject.roomScore},
-                "sideOneScores.max": {$ge: userObject.roomScore},
+                "sideOneScores.min": {$lte: userObject.roomScore},
+                "sideOneScores.max": {$gte: userObject.roomScore},
                 // check age and age range
-                "sideOneAgeRange.min": {$and: [{$le: userObject.age}, {$ge: userObject.ageRange.min}]},
-                "sideOneAgeRange.max": {$and: [{$ge: userObject.age}, {$le: userObject.ageRange.max}]},
+                "sideOneAgeRange.min": {$lte: userObject.age, $gte: userObject.ageRange.min},
+                "sideOneAgeRange.max": {$gte: userObject.age, $lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$le: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT+1},
+                sideOneSize: {$lt: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT+1},
             },
             // Side 1 Criteria (two-sided dating)
             {
                 sideOneIdentity: userObject.identity,
                 sideTwoIdentity: userObject.lookingFor,
                 // check scores
-                "sideOneScores.min": {$le: userObject.roomScore},
-                "sideOneScores.max": {$ge: userObject.roomScore},
+                "sideOneScores.min": {$lte: userObject.roomScore},
+                "sideOneScores.max": {$gte: userObject.roomScore},
                 // check age
-                "sideTwoAgeRange.min": {$le: userObject.age},
-                "sideTwoAgeRange.max": {$ge: userObject.age},
+                "sideTwoAgeRange.min": {$lte: userObject.age},
+                "sideTwoAgeRange.max": {$gte: userObject.age},
                 // check age range
-                "sideOneAgeRange.min": {$ge: userObject.ageRange.min},
-                "sideOneAgeRange.max": {$le: userObject.ageRange.max},
+                "sideOneAgeRange.min": {$gte: userObject.ageRange.min},
+                "sideOneAgeRange.max": {$lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$le: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
+                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
             },
             // Side 2 Criteria (two-sided dating)
             {
                 sideTwoIdentity: userObject.identity,
                 sideOneIdentity: userObject.lookingFor,
                 // check scores
-                "sideTwoScores.min": {$le: userObject.roomScore},
-                "sideTwoScores.max": {$ge: userObject.roomScore},
+                "sideTwoScores.min": {$lte: userObject.roomScore},
+                "sideTwoScores.max": {$gte: userObject.roomScore},
                 // check age
-                "sideOneAgeRange.min": {$le: userObject.age},
-                "sideOneAgeRange.max": {$ge: userObject.age},
+                "sideOneAgeRange.min": {$lte: userObject.age},
+                "sideOneAgeRange.max": {$gte: userObject.age},
                 // check age range
-                "sideTwoAgeRange.min": {$ge: userObject.ageRange.min},
-                "sideTwoAgeRange.max": {$le: userObject.ageRange.max},
+                "sideTwoAgeRange.min": {$gte: userObject.ageRange.min},
+                "sideTwoAgeRange.max": {$lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$le: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
+                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
             }
         ],
         bannedUserList: {$ne: userObject._id},
-    }).exec()
+    }).limit(5).exec()
 }
 
 /**
@@ -83,6 +83,8 @@ async function findExistingRoomForUser(userObject) {
     return new Promise(async (resolve, reject) => {
         try {
             let potentialRooms = await roomSelection(userObject)
+
+            console.log(potentialRooms)
 
             let chosenRoom = undefined
             for (let room of potentialRooms) {

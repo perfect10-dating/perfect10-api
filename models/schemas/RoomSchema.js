@@ -23,7 +23,7 @@ const RoomSchema = new mongoose.Schema({
   // the age range for Side 1 (NOTE -- this is the range of ages for Side2 if two-sided)
   sideOneAgeRange: {min: Number, max: Number},
   // the length of the first array
-  sideOneSize: Number,
+  sideOneSize: {type: Number, required: true, default: 0},
 
   // the second side of the room (empty if single-sided)
   sideTwo: [{type: ObjectId, ref: 'user', required: true}],
@@ -34,7 +34,7 @@ const RoomSchema = new mongoose.Schema({
   // the age range for Side 2 (NOTE -- this is the range of ages for Side1)
   sideTwoAgeRange: {min: Number, max: Number},
   // the length of the second array
-  sideTwoSize: Number,
+  sideTwoSize: {type: Number, required: true, default: 0},
 
   // the users that we DO NOT allow back into the room (they swapped out)
   bannedUserList: [{type: ObjectId, ref: 'user', required: true}],
