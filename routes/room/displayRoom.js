@@ -48,13 +48,16 @@ module.exports = (router) => {
                     // for date collection
                     dateUserIdArray.push(userObj._id)
                     // calculate the distance to that user
-                    userObj.distance = Math.round(calculateDistanceBetweenCoords({
-                        longitude: user.location.coordinates[0],
-                        latitude: user.location.coordinates[1],
-                    }, {
-                        longitude: userObj.location.coordinates[0],
-                        latitude: userObj.location.coordinates[1],
-                    }))
+                    if (userObj.location && userObj.location.coordinates) {
+                        userObj.distance = Math.round(calculateDistanceBetweenCoords({
+                            longitude: user.location.coordinates[0],
+                            latitude: user.location.coordinates[1],
+                        }, {
+                            longitude: userObj.location.coordinates[0],
+                            latitude: userObj.location.coordinates[1],
+                        }))
+                    }
+
                     // clear the location field to prevent stalking
                     userObj.location = undefined
                 }
