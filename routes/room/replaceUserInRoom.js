@@ -139,8 +139,6 @@ async function replaceUserInRoom(userObject) {
                 opposingArray = room.isSingleSided ? workingArray : room.sideTwo
                 room.sideOne = workingArray
             }
-            console.log(onSideTwo)
-            console.log(workingArray)
 
             // rescore the room based on the people currently in it
             room.sideOneScores = getNewScoreRange(room.sideOneScores, room.sideOne)
