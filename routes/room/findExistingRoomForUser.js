@@ -11,16 +11,16 @@ const DateModel = require("../../models/DateModel");
  */
 function roomSelection(userObject) {
     return RoomModel.find({
-        location: {
-            $near: {
-                // convert distance in miles to meters, measure only radially
-                $maxDistance: (userObject.maxDistance / 2) * 1609,
-                $geometry: {
-                    type: "Point",
-                    coordinates: userObject.location.coordinates
-                }
-            }
-        },
+        // location: {
+        //     $near: {
+        //         // convert distance in miles to meters, measure only radially
+        //         $maxDistance: (userObject.maxDistance / 2) * 1609,
+        //         $geometry: {
+        //             type: "Point",
+        //             coordinates: userObject.location.coordinates
+        //         }
+        //     }
+        // },
         $or: [
 
             // Side 1 Criteria (one-sided dating)
@@ -96,7 +96,7 @@ async function findExistingRoomForUser(userObject) {
                     DateModelObject: DateModel,
                     usersToScreen: [userObject],
                     // if either oneSided or the user is on SideTwo, sideOne is the screening side
-                    screeningUsers: ((isSideTwo || isOneSided) ? room.sideOne : room.sideTwo).map(id => {return {id}})
+                    screeningUsers: ((isSideTwo || isOneSided) ? room.sideOne : room.sideTwo)
                 })
 
                 if (screenedUsers.length !== 0) {
@@ -105,9 +105,11 @@ async function findExistingRoomForUser(userObject) {
                 }
             }
 
+            console.log("PASSED FOR LOOP")
+
             // if we found a room
             if (chosenRoom) {
-                let isSideTwo = userObject.identity === chosenRoom.sideTwoIdentity
+                let isSideTwo = userObject.identity !== chosenRoom.sideOneIdentity
 
                 // modify the chosenRoom to include the user and update its lengths
                 let workingArray = isSideTwo ? chosenRoom.sideTwo : chosenRoom.sideOne
