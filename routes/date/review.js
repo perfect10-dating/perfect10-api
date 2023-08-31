@@ -69,6 +69,7 @@ module.exports = (router) => {
 
             // release yourself
             user.mustReviewDate = false
+            user.freeSwaps = Math.max(user.freeSwaps+1, 1)
             await user.save()
 
             // swap yourself out of your old room and allow yourself to choose to join a new one

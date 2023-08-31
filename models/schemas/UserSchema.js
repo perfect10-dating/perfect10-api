@@ -91,6 +91,17 @@ const UserSchema = new mongoose.Schema({
   temporarilyLocked: {type: Boolean, required: true, default: false},
   // the time when the user will be unlocked (only relevant if temporarilyLocked is true)
   unlockTime: {type: Date, required: false},
+  /**
+   * The number of free swaps you have remaining. Can be either positive or negative.
+   * Positive: consumes 1 free swap to swap rooms immediately
+   * 0: Takes 24 hours to swap
+   * -1: 48 hours
+   * -2: 72 hours
+   *
+   * When you go on a date, it sets your freeSwaps to max(freeSwaps+1, 1), meaning that you always get
+   * one free swap, and it resets your timer.
+   */
+  freeSwaps: {type: Number, required: true, default: 3},
 
   // user needs to review a date before they join a new room
   // this will prevent waitingForRoom going back to "true"

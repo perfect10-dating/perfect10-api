@@ -1,7 +1,6 @@
 // the number of days to delay a user switching groups
 const UserModel = require("../../models/UserModel");
 const {removeUserFromRoom, replaceUserInRoom} = require("../room/replaceUserInRoom");
-const DELAY_NUMBER_DAYS = 3
 const MAX_UNBALANCE = .30    // 3:4 person ratio (1/3) causes penalties, but 4:6 (2/4) does not
 
 module.exports = (router) => {
@@ -21,13 +20,11 @@ module.exports = (router) => {
             // immediately switch out the user
             const {room, onSideTwo} = await replaceUserInRoom(user)
 
-            // don't penalize people from leaving unbalanced rooms
-            if (onSideTwo ? (room.sideTwo.length-room.sideOne.length)/(room.sideOne.length||1) < MAX_UNBALANCE
-                : (room.sideOne.length-room.sideTwo.length)/(room.sideTwo.length||1) < MAX_UNBALANCE) {
-                // now make the user wait several days before they can join a new room
-                let currentTime = Date.now()
-                let newTime = currentTime + 86400000*DELAY_NUMBER_DAYS
+            const oldSwapCount = user.freeSwaps
+            user.freeSwaps = Math.max(user.freeSwaps-1, -2)
 
+            if (oldSwapCount < 1) {
+                const newTime = Date.now() + ((-1 * (oldSwapCount-1)) * 1000 * 3600 * 24)
                 user.temporarilyLocked = true
                 user.unlockTime = newTime
             }
