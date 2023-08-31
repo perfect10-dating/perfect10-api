@@ -1,7 +1,7 @@
-import RoomModel from "../../models/RoomModel";
-import {appConfiguration} from "../../appConfiguration";
-import {screenUsers} from "./dateCompetitorFindFunction";
-import DateModel from "../../models/DateModel";
+const RoomModel = require("../../models/RoomModel");
+const {appConfiguration} = require("../../appConfiguration");
+const {screenUsers} = require("./dateCompetitorFindFunction");
+const DateModel = require("../../models/DateModel");
 
 /**
  * Based on the user, find non-filled rooms that would be suitable

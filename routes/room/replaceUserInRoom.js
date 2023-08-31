@@ -18,24 +18,22 @@ async function findRoomsWithUsers(userObject, additionalParameters) {
         try {
             let room = await RoomModel.findOne({_id: userObject.currentRoom}).populate([{
                 path: "spawningUser",
-            }]).exec()
+            }]).populate([
+                {
+                    path: "sideOne",
+                    select: ["roomScore"]
+                },
+                {
+                    path: "sideTwo",
+                    select: ["roomScore"]
+                }
+            ]).exec()
             if (!room) {
                 console.error("The user is not in a room")
                 reject("No room")
             }
-            let onSideTwo = false
-
-            // scan side 2 to see if the user is on that side
-            for (let i = 0; i < room.sideTwo.length; i++) {
-                if (room.sideTwo + "" === userObject._id + "") {
-                    onSideTwo = true
-                }
-            }
-
-            if (onSideTwo) {
-                resolve ({room, onSideTwo: true})
-            }
-            else resolve ({room, onSideTwo: false})
+            let onSideTwo = userObject.identity === room.sideTwoIdentity
+            resolve({room, onSideTwo: onSideTwo})
         }
         catch (err) {
             reject(err)
@@ -43,41 +41,41 @@ async function findRoomsWithUsers(userObject, additionalParameters) {
     })
 }
 
-/*
-Removes the user from a room and DOES NOT replace them
-(this occurs when the user completes a review after a date, or after a setup)
- */
-async function removeUserFromRoom(userObject) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let {room, onSideTwo} = await findRoomsWithUsers(userObject, {})
-            // depending on what side we're on, find the user and remove them from that side
-            let workingArray = []
-            if (onSideTwo) {
-                for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
-                    if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
-                        workingArray.push(room.sideTwo[userIndex])
-                    }
-                }
-                room.sideTwo = workingArray
-            }
-            else {
-                for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
-                    if (room.sideOne[userIndex] + "" !== userObject._id + "") {
-                        workingArray.push(room.sideOne[userIndex])
-                    }
-                }
-                room.sideOne = workingArray
-            }
-
-            await room.save()
-            resolve({msg: "Removing user from room successful", room, onSideTwo})
-        }
-        catch(err) {
-            reject(err)
-        }
-    })
-}
+// /*
+// Removes the user from a room and DOES NOT replace them
+// (this occurs when the user completes a review after a date, or after a setup)
+//  */
+// async function removeUserFromRoom(userObject) {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             let {room, onSideTwo} = await findRoomsWithUsers(userObject, {})
+//             // depending on what side we're on, find the user and remove them from that side
+//             let workingArray = []
+//             if (onSideTwo) {
+//                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
+//                     if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
+//                         workingArray.push(room.sideTwo[userIndex])
+//                     }
+//                 }
+//                 room.sideTwo = workingArray
+//             }
+//             else {
+//                 for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
+//                     if (room.sideOne[userIndex] + "" !== userObject._id + "") {
+//                         workingArray.push(room.sideOne[userIndex])
+//                     }
+//                 }
+//                 room.sideOne = workingArray
+//             }
+//
+//             await room.save()
+//             resolve({msg: "Removing user from room successful", room, onSideTwo})
+//         }
+//         catch(err) {
+//             reject(err)
+//         }
+//     })
+// }
 
 /**
  * Gets the new score range for a room
@@ -122,7 +120,7 @@ async function replaceUserInRoom(userObject) {
                 selectionAgeRange = room.sideOneAgeRange
                 opposingArray = room.sideOne
                 for (let userIndex = 0; userIndex < room.sideTwo.length; userIndex++) {
-                    if (room.sideTwo[userIndex] + "" !== userObject._id + "") {
+                    if (room.sideTwo[userIndex]._id + "" !== userObject._id + "") {
                         workingArray.push(room.sideTwo[userIndex])
                     }
                 }
@@ -134,7 +132,7 @@ async function replaceUserInRoom(userObject) {
                 // if it's single sided, use SideOne, otherwise use SideTwo
                 selectionAgeRange = room.isSingleSided ? room.sideOneAgeRange : room.sideTwoAgeRange
                 for (let userIndex = 0; userIndex < room.sideOne.length; userIndex++) {
-                    if (room.sideOne[userIndex] + "" !== userObject._id + "") {
+                    if (room.sideOne[userIndex]._id + "" !== userObject._id + "") {
                         workingArray.push(room.sideOne[userIndex])
                     }
                 }
@@ -154,7 +152,7 @@ async function replaceUserInRoom(userObject) {
             room = await room.save()
 
             // Now the interesting part -- find a set of people that may work in this room
-            let newUsers = await UserModel.findOne(
+            let newUsers = await UserModel.find(
                 roomSelectionCriteria(
                     {
                         user: room.spawningUser,
@@ -177,7 +175,7 @@ async function replaceUserInRoom(userObject) {
             let screenedUsers = await screenUsers({
                 DateModelObject: Date,
                 usersToScreen: newUsers,
-                screeningUsers: opposingArray.map(id => {return {_id}}),
+                screeningUsers: opposingArray,
                 allowNonEmpty: false})
 
             let newUser = screenedUsers[0]
@@ -206,4 +204,4 @@ async function replaceUserInRoom(userObject) {
     })
 }
 
-module.exports = {findRoomsWithUsers, removeUserFromRoom, replaceUserInRoom}
+module.exports = {findRoomsWithUsers, replaceUserInRoom}

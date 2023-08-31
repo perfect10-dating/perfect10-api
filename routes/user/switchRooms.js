@@ -18,11 +18,11 @@ module.exports = (router) => {
             let user = await UserModel.findOne({cognitoId}).exec()
 
             // immediately switch out the user
-            const {room, onSideTwo} = await replaceUserInRoom(user)
+            await replaceUserInRoom(user)
 
-            const oldSwapCount = user.freeSwaps
+            const oldSwapCount = user.freeSwaps || 0
             // removes one free swap, lower limit of -2
-            user.freeSwaps = Math.max(user.freeSwaps-1, -2)
+            user.freeSwaps = Math.max((user.freeSwaps || 0)-1, -2)
 
             // cases: 0-> 24 hrs, -1-> 48 hours, -2-> 72 hours
             if (oldSwapCount < 1) {
