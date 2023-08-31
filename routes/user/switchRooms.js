@@ -21,8 +21,10 @@ module.exports = (router) => {
             const {room, onSideTwo} = await replaceUserInRoom(user)
 
             const oldSwapCount = user.freeSwaps
+            // removes one free swap, lower limit of -2
             user.freeSwaps = Math.max(user.freeSwaps-1, -2)
 
+            // cases: 0-> 24 hrs, -1-> 48 hours, -2-> 72 hours
             if (oldSwapCount < 1) {
                 const newTime = Date.now() + ((-1 * (oldSwapCount-1)) * 1000 * 3600 * 24)
                 user.temporarilyLocked = true
