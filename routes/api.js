@@ -18,6 +18,7 @@ const cognitoExpress = new CognitoExpress({
 // specify routes that permit unauthenticated access
 const UNAUTHENTICATED_ROUTES = [
     '/create-user',
+    '/log-qr-code',
     '/generate-random-users',
     '/form-room-test',
 ]
@@ -93,12 +94,9 @@ require('./date/proposeSetup')(router)
 require('./date/reject')(router)
 require('./date/review')(router)
 require('./date/viewProposedDates')(router)
-// entry routes
-// require('./entry/gainQueuePriority')(router)
-// require('./entry/joinQueue')(router)
 
-// global
-// require('./global/displayRoomOptions')(router)
+// logging
+require("./logging/logQrCode")(router)
 
 // room
 require('./room/displayRoom')(router)
