@@ -1,4 +1,5 @@
 const QrCodeModel = require("../../models/QrCodeModel");
+
 module.exports = (router) => {
     router.post('/log-qr-code', async (req, res) => {
         let {qrCode} = req.body
@@ -7,7 +8,7 @@ module.exports = (router) => {
         }
 
         try {
-            let qrCodeObject = QrCodeModel.findOne({_id: qrCode}).exec()
+            let qrCodeObject = await QrCodeModel.findOne({_id: qrCode}).exec()
             if (!qrCodeObject) {
                 console.error("LOG-QR-CODE: qrCodeObject not found")
                 return res.status(404).json("This QR code does not exist in the database")
@@ -17,7 +18,7 @@ module.exports = (router) => {
 
             await qrCodeObject.save()
 
-            return res.status(500).json("Updating qrCodeObject successful")
+            return res.status(200).json("Updating qrCodeObject successful")
         }
         catch (err) {
             console.error(err)
