@@ -65,6 +65,7 @@ async function sendPinpointMessage({messageType, destinationNumber, message}) {
     };
 
     console.log("SEND-PINPOINT-MESSAGE: attempting to send the message")
+    console.log(params.MessageRequest.Addresses)
     console.log(params.MessageRequest.MessageConfiguration.SMSMessage)
     //Try to send the message.
     return pinpoint.sendMessages(params).promise()

@@ -7,10 +7,10 @@ module.exports = (router) => {
 
             try {
                 let response = await sendPinpointMessage({
-                    messageType: "PROMOTIONAL", destinationAddress, message
+                    messageType: "PROMOTIONAL", destinationNumber: destinationAddress, message
                 })
-                console.log(response)
-                console.log(response.MessageResponse.Result)
+                // console.log(response)
+                // console.log(response.MessageResponse.Result)
 
                 return res.status(200).json("message sent")
 
