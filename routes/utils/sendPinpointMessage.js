@@ -20,7 +20,7 @@ const applicationId = "73d5287cf9de455ca63279dc97ef1542";
 // const messageType = "PROMOTIONAL";
 
 // // The registered keyword associated with the originating short code.
-// const registeredKeyword = "myKeyword";
+const registeredKeyword = "KEYWORD_876136371500";
 
 // The sender ID to use when sending the message. Support for sender ID
 // varies by country or region. For more information, see
@@ -43,40 +43,31 @@ const pinpoint = new AWS.Pinpoint();
  * send a single message via AWS Pinpoint to destinationNumber
  */
 async function sendPinpointMessage({messageType, destinationNumber, message}) {
-    return new Promise((resolve, reject) => {
-        // Specify the parameters to pass to the API.
-        const params = {
-            ApplicationId: applicationId,
-            MessageRequest: {
-                Addresses: {
-                    [destinationNumber]: {
-                        ChannelType: 'SMS'
-                    }
-                },
-                MessageConfiguration: {
-                    SMSMessage: {
-                        Body: message,
-                        // Keyword: registeredKeyword,
-                        MessageType: messageType,
-                        OriginationNumber: originationNumber,
-                        SenderId: senderId,
-                    }
+    // Specify the parameters to pass to the API.
+    const params = {
+        ApplicationId: applicationId,
+        MessageRequest: {
+            Addresses: {
+                [destinationNumber]: {
+                    ChannelType: 'SMS'
+                }
+            },
+            MessageConfiguration: {
+                SMSMessage: {
+                    Body: message,
+                    Keyword: registeredKeyword,
+                    MessageType: messageType,
+                    OriginationNumber: originationNumber,
+                    SenderId: senderId,
                 }
             }
-        };
+        }
+    };
 
-        console.log("SEND-PINPOINT-MESSAGE: attempting to send the message")
-        //Try to send the message.
-        pinpoint.sendMessages(params, function(err, data) {
-            // If something goes wrong, print an error message.
-            if(err) {
-                reject(err)
-                // Otherwise, show the unique ID for the message.
-            } else {
-                resolve()
-            }
-        });
-    })
+    console.log("SEND-PINPOINT-MESSAGE: attempting to send the message")
+    console.log(params.MessageRequest.MessageConfiguration.SMSMessage)
+    //Try to send the message.
+    return pinpoint.sendMessages(params).promise()
 }
 
 module.exports = {sendPinpointMessage}
