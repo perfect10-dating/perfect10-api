@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
   // the last name (optional)
   lastName: {type: String},
   // the person's identity
-  identity: {type: String, required: true, enum: ['man', 'woman', 'transMan', 'transWoman', 'nonBinary']},
+  identity: {type: String, required: true, enum: ['man', 'woman', 'transMan', 'transWoman', 'nonbinary']},
   // the person's age (in years)
   age: {type: Number, required: true},
   dateOfBirth: {type: Date, required: true},
