@@ -155,7 +155,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
 
                 await Promise.all([potentialPartners, competitors]).map(userArray => {
                     return Promise.all(userArray.map(indUser => {
-                        sendPinpointMessage({
+                        return sendPinpointMessage({
                             messageType: "PROMOTIONAL",
                             destinationNumber: indUser.phoneNumber,
                             message:

@@ -6,6 +6,7 @@ const {roomSelectionCriteria} = require("./roomUserSelectionCriteria");
 const UserModel = require("../../models/UserModel");
 const {screenUsers} = require("./dateCompetitorFindFunction");
 const DateModel = require("../../models/DateModel");
+const {sendPinpointMessage} = require("../utils/sendPinpointMessage");
 
 /*
 NOTE: expects a user with currentRoom field that has not had lean() called.
@@ -168,7 +169,7 @@ async function replaceUserInRoom(userObject) {
                 // gives priorityMode priority, then the last users to queue (smallest value)
                 .sort({priorityMode: -1, roomEnqueueTime: 1})
                 .limit(20)
-                .select(["_id", "waitingForRoom", "currentRoom"])
+                .select(["_id", "waitingForRoom", "currentRoom", "phoneNumber", "firstName"])
                 .exec()
 
             // next, get the dates these people went on with those on opposingArray
@@ -196,6 +197,15 @@ async function replaceUserInRoom(userObject) {
             // now re-save
             await room.save()
             await newUser.save()
+
+            // now alert the new user that they're in a room
+            await sendPinpointMessage({
+                messageType: "PROMOTIONAL",
+                destinationNumber: newUser.phoneNumber,
+                message:
+`Hi ${newUser.firstName}! This is Rizzly, letting you know that we created a room for you. View your matches now at https://rizz.ly`
+            })
+
             resolve("Successfully swapped out the user")
         }
         catch (err) {
