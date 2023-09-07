@@ -21,6 +21,7 @@ const UNAUTHENTICATED_ROUTES = [
     '/log-qr-code',
     '/generate-random-users',
     '/form-room-test',
+    '/test-send-message',
 ]
 
 const ADMIN_ROUTES = []
@@ -82,7 +83,7 @@ router.use(async function (req, res, next) {
 // END ROUTE AUTHENTICATION
 
 // BEGIN CUSTOM ROUTE REGISTRATION
-// conversation routs
+// conversation routes
 require('./conversation/getMessages')(router)
 require('./conversation/postMessage')(router)
 
@@ -113,6 +114,9 @@ require('./user/generate-random-users')(router)
 
 // upload images
 require('./utils/util-route')(router)
+
+// messages
+require('./utils/testSendMessage')(router)
 
 // END CUSTOM ROUTE REGISTRATION
 
