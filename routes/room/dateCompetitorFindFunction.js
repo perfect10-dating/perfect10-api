@@ -31,7 +31,7 @@ async function findUserFunction({UserModelObject, user, choice, identity, minSco
         .sort({priorityMode: -1, roomEnqueueTime: 1})
         .skip(offset)
         .limit(searchCount)
-        .select(["_id", "waitingForRoom", "identity", "currentRoom", "ageRange", "age"])
+        .select(["_id", "waitingForRoom", "identity", "currentRoom", "ageRange", "age", "phoneNumber", "firstName"])
         .exec()
 }
 
