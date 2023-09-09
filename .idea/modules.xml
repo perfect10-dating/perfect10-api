@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/perfect10-api.iml" filepath="$PROJECT_DIR$/.idea/perfect10-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/../perfect10-frontend/.idea/perfect10-frontend.iml" filepath="$PROJECT_DIR$/../perfect10-frontend/.idea/perfect10-frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../rizzly-analytics/.idea/rizzly-analytics.iml" filepath="$PROJECT_DIR$/../rizzly-analytics/.idea/rizzly-analytics.iml" />
     </modules>
   </component>
 </project>

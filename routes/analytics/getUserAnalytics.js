@@ -148,7 +148,7 @@ module.exports = (router) => {
                     demographicsObject: regionObject.demographics, identity: user.identity, lookingFor: user.lookingFor
                 })
 
-                returnObject.shortTerm += 1
+                returnObject.overall.shortTerm += 1
                 regionObject.shortTerm += 1
             }
 
