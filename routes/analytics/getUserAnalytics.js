@@ -78,6 +78,7 @@ module.exports = (router) => {
      *
      * where AnalyticsObject = {
      *     signups: [{date: Date, count: Number, cumulative: Number}],
+     *     shortTerm: Number,
      *     demographics: {
      *         <identity>: {
      *             count: Number,
@@ -98,6 +99,7 @@ module.exports = (router) => {
                 overall: {
                     signups: [],
                     demographics: {},
+                    shortTerm: 0,
                 },
                 regions: {},
                 last10Users: users.slice(-10)
@@ -126,6 +128,7 @@ module.exports = (router) => {
                     regionCoordinates = userCoordsAsObject
                     regionObject = {
                         signups: [],
+                        shortTerm: 0,
                         demographics: {}
                     }
                     returnObject.regions[JSON.stringify(userCoordsAsObject)] = regionObject
@@ -144,6 +147,9 @@ module.exports = (router) => {
                 updateDemographics({
                     demographicsObject: regionObject.demographics, identity: user.identity, lookingFor: user.lookingFor
                 })
+
+                returnObject.shortTerm += 1
+                regionObject.shortTerm += 1
             }
 
             return res.status(200).json(returnObject)
