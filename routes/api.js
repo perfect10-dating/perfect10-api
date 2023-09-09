@@ -22,6 +22,7 @@ const UNAUTHENTICATED_ROUTES = [
     '/generate-random-users',
     '/form-room-test',
     '/test-send-message',
+    '/get-user-analytics',
 ]
 
 const ADMIN_ROUTES = []
@@ -117,6 +118,9 @@ require('./utils/util-route')(router)
 
 // messages
 require('./utils/testSendMessage')(router)
+
+// analytics
+require('./analytics/getUserAnalytics')(router)
 
 // END CUSTOM ROUTE REGISTRATION
 
