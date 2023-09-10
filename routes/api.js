@@ -23,6 +23,7 @@ const UNAUTHENTICATED_ROUTES = [
     '/form-room-test',
     '/test-send-message',
     '/get-user-analytics',
+    '/does-phone-number-exist',
 ]
 
 const ADMIN_ROUTES = []
