@@ -92,7 +92,7 @@ module.exports = (router) => {
     router.get('/get-user-analytics', async (req, res) => {
         try {
             const users = await UserModel.find()
-                .select(["createdAt", "lookingFor", "identity", "firstName", "location", "_id"])
+                .select(["createdAt", "lookingFor", "identity", "firstName", "location", "_id", "shortTerm"])
                 .lean().exec()
 
             let returnObject = {
@@ -148,8 +148,11 @@ module.exports = (router) => {
                     demographicsObject: regionObject.demographics, identity: user.identity, lookingFor: user.lookingFor
                 })
 
-                returnObject.overall.shortTerm += 1
-                regionObject.shortTerm += 1
+                if (user.shortTerm) {
+                    returnObject.overall.shortTerm += 1
+                    regionObject.shortTerm += 1
+                }
+                
             }
 
             return res.status(200).json(returnObject)
