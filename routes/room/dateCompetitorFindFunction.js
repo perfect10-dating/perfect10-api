@@ -2,7 +2,7 @@
 const UserModel = require("../../models/UserModel");
 const {roomSelectionCriteria} = require("./roomUserSelectionCriteria");
 const DateModel = require("../../models/DateModel");
-const {appConfiguration} = require("../../appConfiguration");
+const {appConfiguration} = require("../appConfiguration");
 
 
 const USERS_TO_GET_PER_PASS = 20

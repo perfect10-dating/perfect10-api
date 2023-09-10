@@ -106,6 +106,7 @@ require('./room/formRoom')(router)
 
 // user
 require('./user/create')(router)
+require('./user/does-phone-number-exist')(router)
 require('./user/edit')(router)
 require('./user/get-user')(router)
 require('./user/readyJoinRoom')(router)

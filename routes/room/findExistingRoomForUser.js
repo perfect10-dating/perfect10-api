@@ -1,5 +1,5 @@
 const RoomModel = require("../../models/RoomModel");
-const {appConfiguration} = require("../../appConfiguration");
+const {appConfiguration} = require("../appConfiguration");
 const {screenUsers} = require("./dateCompetitorFindFunction");
 const DateModel = require("../../models/DateModel");
 
