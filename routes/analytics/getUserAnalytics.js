@@ -1,7 +1,7 @@
 const UserModel = require("../../models/UserModel");
 const {calculateDistanceBetweenCoords} = require("../room/calculateDistanceBetweenCoords");
 
-const REGION_RADIUS = 100
+const REGION_RADIUS = 50
 
 /**
  * Adds a single user to the signupList
@@ -9,16 +9,24 @@ const REGION_RADIUS = 100
  * @param signupList
  * @param userDateObj
  */
-const addToSignupList = ({signupList, userDateObj}) => {
+const addToSignupList = ({signupList, userDateObj, userProfileComplete}) => {
+    
     if (signupList.length > 0 && signupList[signupList.length - 1].date === userDateObj.toDateString()) {
         signupList[signupList.length - 1].count += 1
         signupList[signupList.length - 1].cumulative += 1
+        if (userProfileComplete) {
+            signupList[signupList.length - 1].cumulativeComplete += 1
+        }
     }
     else {
         signupList.push({date: userDateObj.toDateString(), count: 1, cumulative: (
             // logic that sums the previous element in the array with the current user
             signupList.length > 0 ? signupList[signupList.length-1].cumulative+1 : 1
-            )})
+            ),
+            
+            cumulativeComplete: signupList.length > 0 ?
+              signupList[signupList.length-1].cumulativeComplete+(userProfileComplete ? 1 : 0) : (userProfileComplete ? 1 : 0)
+        })
     }
 }
 
@@ -77,7 +85,7 @@ module.exports = (router) => {
      * }
      *
      * where AnalyticsObject = {
-     *     signups: [{date: Date, count: Number, cumulative: Number}],
+     *     signups: [{date: Date, count: Number, cumulative: Number, cumulativeComplete: Number}],
      *     shortTerm: Number,
      *     demographics: {
      *         <identity>: {
@@ -92,7 +100,7 @@ module.exports = (router) => {
     router.get('/get-user-analytics', async (req, res) => {
         try {
             const users = await UserModel.find()
-                .select(["createdAt", "lookingFor", "identity", "firstName", "location", "_id", "shortTerm"])
+                .select(["createdAt", "lookingFor", "identity", "firstName", "location", "_id", "shortTerm", "profileComplete"])
                 .lean().exec()
 
             let returnObject = {
@@ -136,8 +144,16 @@ module.exports = (router) => {
 
                 // STEP 2
                 // add the user to the signups lists
-                addToSignupList({signupList: returnObject.overall.signups, userDateObj})
-                addToSignupList({signupList: regionObject.signups, userDateObj})
+                addToSignupList({
+                    signupList: returnObject.overall.signups,
+                    userDateObj,
+                    userProfileComplete: user.profileComplete
+                })
+                addToSignupList({
+                    signupList: regionObject.signups,
+                    userDateObj,
+                    userProfileComplete: user.profileComplete
+                })
 
                 // STEP 3
                 // update the demographics for the user
@@ -152,7 +168,6 @@ module.exports = (router) => {
                     returnObject.overall.shortTerm += 1
                     regionObject.shortTerm += 1
                 }
-                
             }
 
             return res.status(200).json(returnObject)
