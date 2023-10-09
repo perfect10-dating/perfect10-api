@@ -31,18 +31,26 @@ module.exports = (router) => {
         // get the count of users that are interested in you, but you have not crushed on
       let peopleCrushingOnYou = await LookupRequestModel.find({
         $or: generateLookupQueries({userModel: ownUser}),
-        mutualInterest: false
+        isMutual: false
       }).lean().exec()
   
       // find other users that are mutually interested in you
-      let mutualLookupRequests = await LookupRequestModel.find({lookingUser: ownUser, mutualInterest: true}).lean().exec()
+      let mutualLookupRequests = await LookupRequestModel.find({
+        $or: [
+          {lookingUser: ownUser, isMutual: true},
+          {$or: generateLookupQueries({userModel: ownUser})}
+        ]
+      }).lean().exec()
+      console.log(mutualLookupRequests)
       let userIds = mutualLookupRequests.filter(req => !!req.queryUser).map(req => req.queryUser)
       let emails = mutualLookupRequests.filter(req => !!req.queryEmail).map(req => req.queryEmail)
+      console.log(userIds)
+      console.log(emails)
       
       let userModels = await UserModel.find({_id: userIds}).select(
         ["_id", "firstName", "identity", "age", "location", "photoLinks", "shortTerm"]
       ).lean().exec()
-      let userModelsFromEmail = await UserModel.find({emailAddress: emails}).select(
+      let userModelsFromEmail = await UserModel.find({emailAddress: {$in: emails}}).select(
         ["_id", "firstName", "identity", "age", "location", "photoLinks", "shortTerm"]
       ).lean().exec()
     
