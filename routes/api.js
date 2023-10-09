@@ -124,6 +124,10 @@ require('./utils/testSendMessage')(router)
 // analytics
 require('./analytics/getUserAnalytics')(router)
 
+// lookup
+require('./lookup/lookup')
+require('./lookup/showCrushList')
+
 // END CUSTOM ROUTE REGISTRATION
 
 module.exports = router
