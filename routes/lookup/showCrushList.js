@@ -1,6 +1,7 @@
 const UserModel = require("../../models/UserModel");
 const LookupRequestModel = require("../../models/LookupRequestModel");
 const {generateLookupQueries} = require("./generateLookupQueries");
+const ConversationModel = require("../../models/ConversationModel");
 
 module.exports = (router) => {
   router.get('/show-crush-list', async (req, res) => {
@@ -35,8 +36,14 @@ module.exports = (router) => {
       ).lean().exec()
     
       userModels = userModels.concat(userModelsFromEmail)
+  
+      // ====================== BEGIN: getting conversations ======================/
+      let conversations = await ConversationModel.find({$and: [
+          {users: ownUser},
+          {users: {$in: userModels}}
+        ]}).lean().exec()
       
-      return res.status(200).json({userModels, peopleCrushingOnYouCount: peopleCrushingOnYou.length, yourCrushes})
+      return res.status(200).json({userModels, peopleCrushingOnYouCount: peopleCrushingOnYou.length, yourCrushes, conversations})
     }
     catch (err) {
       console.error(err)
