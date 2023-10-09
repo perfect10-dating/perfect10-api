@@ -1,5 +1,6 @@
 const UserModel = require("../../models/UserModel");
 const LookupRequestModel = require("../../models/LookupRequestModel");
+const {generateLookupQueries} = require("./generateLookupQueries");
 
 module.exports = (router) => {
   router.post('/lookup', async (req, res) => {
@@ -16,10 +17,17 @@ module.exports = (router) => {
         return res.status(404).json("Please make sure you are logged in")
       }
       
-      // STEP 1 -- check to see if the other person already looked you up
-      let existingLookupRequest = await LookupRequestModel.findOne({lookingUser: otherUser, $or: [
-          {queryEmail: ownUser.emailAddress, queryUser: ownUser}
-        ]})
+      // STEP 0 -- make sure you haven't looked the other person up yet
+      let ownExistingLookupRequest = await LookupRequestModel.findOne({lookingUser: ownUser,
+        $or: generateLookupQueries({userModel: otherUser, queryEmail})
+      })
+      if (ownExistingLookupRequest) {
+        return res.status(400).json("You have already crushed on this person")
+      }
+      
+          // STEP 1 -- check to see if the other person already looked you up
+      let existingLookupRequest = await LookupRequestModel.findOne({lookingUser: otherUser,
+        $or: generateLookupQueries({userModel: ownUser})})
       
       // if so, set the lookup request to mutual (both people can see one another's profiles
       if (existingLookupRequest) {
