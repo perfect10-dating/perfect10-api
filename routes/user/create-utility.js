@@ -2,7 +2,7 @@ const {joinProperGroups} = require("../userGroup/joinProperGroups");
 const UserModel = require("../../models/UserModel");
 const PRIORITY_TIME_INC_MS = 1000 * 60 * 60 * 24 * 30     // 1 month
 
-async function createUtility({identity, age, lookingFor, cognitoId, phoneNumber, firstName,
+async function createUtility({identity, age, lookingFor, cognitoId, phoneNumber, email, firstName,
                                  unixBirthDate, location, ageRange, referringUser}) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -15,6 +15,7 @@ async function createUtility({identity, age, lookingFor, cognitoId, phoneNumber,
                 // explicit fields
                 cognitoId: cognitoId,
                 phoneNumber: phoneNumber,
+                emailAddress: email,
                 firstName: firstName,
                 identity: identity,
                 dateOfBirth: unixBirthDate,

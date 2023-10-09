@@ -7,10 +7,10 @@ const {createUtility} = require("./create-utility");
 module.exports = (router) => {
     router.post('/create-user', async (req, res) => {
         // TODO -- screen all the fields to make sure they all exist on the new user
-        let {cognitoId, phoneNumber, firstName, identity, birthDate, longitude, latitude, lookingFor,
+        let {cognitoId, phoneNumber, email, firstName, identity, birthDate, longitude, latitude, lookingFor,
             referringUser} = req.body
 
-        if (!cognitoId || !phoneNumber || !firstName || !identity || !birthDate || !longitude || !latitude ||
+        if (!cognitoId || !phoneNumber || !email || !firstName || !identity || !birthDate || !longitude || !latitude ||
             !lookingFor
         ) {
             console.log("CREATE-USER: Rejecting because of unspecified fields")
@@ -35,7 +35,7 @@ module.exports = (router) => {
         try {
             // use the creation utility rather than doing this ourselves
             const savedUser = await createUtility({
-                identity, age, lookingFor, cognitoId, phoneNumber, firstName, unixBirthDate, location, ageRange, referringUser
+                identity, age, lookingFor, cognitoId, phoneNumber, email, firstName, unixBirthDate, location, ageRange, referringUser
             })
 
             return res.status(200).json(savedUser._id)
