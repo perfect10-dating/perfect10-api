@@ -125,8 +125,8 @@ require('./utils/testSendMessage')(router)
 require('./analytics/getUserAnalytics')(router)
 
 // lookup
-require('./lookup/lookup')
-require('./lookup/showCrushList')
+require('./lookup/lookup')(router)
+require('./lookup/showCrushList')(router)
 
 // END CUSTOM ROUTE REGISTRATION
 

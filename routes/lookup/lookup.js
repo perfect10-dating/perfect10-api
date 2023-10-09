@@ -19,7 +19,7 @@ module.exports = (router) => {
       
       // STEP 0 -- make sure you haven't looked the other person up yet
       let ownExistingLookupRequest = await LookupRequestModel.findOne({lookingUser: ownUser,
-        $or: generateLookupQueries({userModel: otherUser, queryEmail})
+        $or: generateLookupQueries({userModel: otherUser, queryEmail: lookupEmail})
       })
       if (ownExistingLookupRequest) {
         return res.status(400).json("You have already crushed on this person")
