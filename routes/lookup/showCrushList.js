@@ -15,7 +15,18 @@ module.exports = (router) => {
       // find all users you have crushed on, but have not reciprocated
       let yourCrushes = await LookupRequestModel.find({
         lookingUser: ownUser
+      }).populate({
+        path: 'queryUser',
+        select: 'emailAddress'
       }).lean().exec()
+      yourCrushes = yourCrushes.map(crush => {
+        if (crush.queryUser) {
+          return crush.queryUser.emailAddress
+        }
+        else {
+          return crush.queryEmail
+        }
+      })
     
         // get the count of users that are interested in you, but you have not crushed on
       let peopleCrushingOnYou = await LookupRequestModel.find({
