@@ -12,7 +12,7 @@ module.exports = (router) => {
         return res.status(404).json("Please make sure you are logged in")
       }
   
-      // find all users you have crushed on, but have not reciprocated
+      // find all users you have crushed on
       let yourCrushes = await LookupRequestModel.find({
         lookingUser: ownUser
       }).populate({
