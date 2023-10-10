@@ -1,6 +1,7 @@
 const UserModel = require("../../models/UserModel");
 const LookupRequestModel = require("../../models/LookupRequestModel");
 const {generateLookupQueries} = require("./generateLookupQueries");
+const {sendEmail} = require("../mailing/sendEmail");
 
 module.exports = (router) => {
   router.post('/lookup', async (req, res) => {
@@ -25,7 +26,7 @@ module.exports = (router) => {
         return res.status(400).json("You have already crushed on this person")
       }
       
-          // STEP 1 -- check to see if the other person already looked you up
+      // STEP 1 -- check to see if the other person already looked you up
       let existingLookupRequest = await LookupRequestModel.findOne({lookingUser: otherUser,
         $or: generateLookupQueries({userModel: ownUser})})
       
@@ -46,7 +47,12 @@ module.exports = (router) => {
       }
       await newLookupRequest.save()
       
-      // TODO -- send an email to the email address telling them that they have a crush
+      // STEP 3: send an email to the email address telling them that they have a crush
+      await sendEmail({
+        to: lookupEmail,
+        subject: "Someone is crushing on you!",
+        text: `Somebody thinks you're cute. Curious? Look them up on https://www.rizz.ly/skip`
+      })
       
       return res.status(200).json("Crush posted")
     }

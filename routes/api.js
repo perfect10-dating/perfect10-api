@@ -24,6 +24,7 @@ const UNAUTHENTICATED_ROUTES = [
     '/test-send-message',
     '/get-user-analytics',
     '/does-phone-number-exist',
+    '/test-send-email'
 ]
 
 const ADMIN_ROUTES = []
@@ -127,6 +128,9 @@ require('./analytics/getUserAnalytics')(router)
 // lookup
 require('./lookup/lookup')(router)
 require('./lookup/showCrushList')(router)
+
+// emails
+require('./mailing/testSendEmail')(router)
 
 // END CUSTOM ROUTE REGISTRATION
 
