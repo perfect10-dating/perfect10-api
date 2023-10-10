@@ -51,7 +51,7 @@ module.exports = (router) => {
       await sendEmail({
         to: lookupEmail,
         subject: "Someone is crushing on you!",
-        text: `Somebody thinks you're cute. Curious? Look them up on https://www.rizz.ly/skip`
+        text: `You have a secret admirer! Curious? Look them up on https://www.rizz.ly/skip`
       })
       
       return res.status(200).json("Crush posted")
