@@ -41,11 +41,11 @@ module.exports = (router) => {
           {$or: generateLookupQueries({userModel: ownUser})}
         ]
       }).lean().exec()
-      console.log(mutualLookupRequests)
+      // console.log(mutualLookupRequests)
       let userIds = mutualLookupRequests.filter(req => !!req.queryUser).map(req => req.queryUser)
       let emails = mutualLookupRequests.filter(req => !!req.queryEmail).map(req => req.queryEmail)
-      console.log(userIds)
-      console.log(emails)
+      // console.log(userIds)
+      // console.log(emails)
       
       let userModels = await UserModel.find({_id: userIds}).select(
         ["_id", "firstName", "identity", "age", "location", "photoLinks", "shortTerm"]

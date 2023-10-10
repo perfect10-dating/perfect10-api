@@ -1,6 +1,10 @@
 const generateLookupQueries = ({userModel, queryEmail}) => {
-  return (queryEmail || userModel.emailAddress) ?
-    [{queryEmail: queryEmail || userModel.emailAddress}, {queryUser: userModel}] :
+  if (queryEmail) {
+    return [{queryEmail}]
+  }
+
+  return userModel.emailAddress ?
+    [{queryEmail: userModel.emailAddress}, {queryUser: userModel}] :
     [{queryUser: userModel}]
 }
 
