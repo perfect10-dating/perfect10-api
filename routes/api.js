@@ -24,7 +24,8 @@ const UNAUTHENTICATED_ROUTES = [
     '/test-send-message',
     '/get-user-analytics',
     '/does-phone-number-exist',
-    '/test-send-email'
+    '/test-send-email',
+    '/email-everyone-uvm'
 ]
 
 const ADMIN_ROUTES = []
@@ -131,6 +132,7 @@ require('./lookup/showCrushList')(router)
 
 // emails
 require('./mailing/testSendEmail')(router)
+require('./mailing/emailEveryoneUVM')(router)
 
 // END CUSTOM ROUTE REGISTRATION
 
