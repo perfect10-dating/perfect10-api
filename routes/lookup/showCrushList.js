@@ -38,7 +38,10 @@ module.exports = (router) => {
       let mutualLookupRequests = await LookupRequestModel.find({
         $or: [
           {lookingUser: ownUser, isMutual: true},
-          {$or: generateLookupQueries({userModel: ownUser})}
+          {
+            $or: generateLookupQueries({userModel: ownUser}),
+            isMutual: true,
+          }
         ]
       }).lean().exec()
       // console.log(mutualLookupRequests)
