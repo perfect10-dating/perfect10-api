@@ -102,7 +102,6 @@ const UserSchema = new mongoose.Schema({
    * one free swap, and it resets your timer.
    */
   freeSwaps: {type: Number, required: true, default: 3},
-
   // user needs to review a date before they join a new room
   // this will prevent waitingForRoom going back to "true"
   mustReviewDate: {type: Boolean, required: true, default: false},

@@ -52,8 +52,15 @@ module.exports = (router) => {
             for (let i = 0; i < date.users.length; i++) {
                 date.users[i].mustReviewDate = true
                 date.users[i].lockingDate = date._id
-                // also marks them as no longer new
-                date.users[i].isNew = false
+                // TODO -- also marks them as no longer new
+                /**
+                 * Advantages --
+                 * 1. isNew prevents users scoring mediocre results from seeing untested users
+                 * Disadvantages --
+                 * 1. splitting user pools --> slower matchmaking
+                 * 2. new people see some profiles that are guaranteed not creepy
+                 */
+                // date.users[i].isNew = false
                 promiseArray.push(date.users[i].save())
             }
 

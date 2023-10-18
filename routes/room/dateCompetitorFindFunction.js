@@ -256,12 +256,6 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
         try {
             let UserModelObject = UserModel
             let DateModelObject = DateModel
-            if (UserModelType === "UserTestModel") {
-                // TODO -- switch to test model if this is a test
-            }
-            if (DateModelType === "DateTestModel") {
-                // TODO -- switch to test model if this is a test
-            }
 
             let isOneSided = false
             if (user.identity === choiceIdentity) {
@@ -363,7 +357,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         // just the average of the ageRange; a pretty likely place for user ages to center
                         setPointAge: (user.ageRange.max-user.ageRange.min)/2,
                         oldUserArray: potentialPartners,
-                        newUserAmount: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM
+                        newUserAmount: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM
                     })
                     // because this is two-sided:
                     //  the newSelectionAgeRange (bounds the ages on sideOne) becomes the ageRange on sideTwo
@@ -406,6 +400,10 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                             allowNonEmpty: true
                         })
                     )
+                    
+                    if (competitors.length > 0) {
+                        competitors = competitors.slice(0, Math.min(competitors.length, appConfiguration.TWO_SIDED_COMPETITOR_COUNT_MINIMUM))
+                    }
 
                     // NOTE -- we don't calculate age range here because age selection is already done by
                     // leastPermissiveAgeRange, and ageRange is determined by sideOneAgeRange

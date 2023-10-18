@@ -23,6 +23,8 @@ module.exports = (router) => {
                     phoneNumber: (Math.random() * 1000000).toString(),
                     firstName: name,
                     unixBirthDate: 0,
+                    waitingForRoom: true,
+                    profileComplete: true,
                     location: {type: "Point", coordinates: [longitude, latitude]},
                     ageRange: {
                         // ASSUME that the user always goes at least one tick over / under, and as many as AGE_RANGE_MAX_SPREAD

@@ -167,7 +167,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 })
             }
 
-            console.log({potentialPartners, competitors})
+            // console.log({potentialPartners, competitors})
 
             return resolve({
                 potentialPartners, competitors
@@ -229,10 +229,20 @@ module.exports = (router) => {
             }
 
             try {
-                await formRoomFunction(user, false)
+                await formRoomFunction(user, true)
                 return res.status(200).json("Formed a new room")
             } catch (err) {
-                return res.status(500).json(err)
+                console.error(err)
+    
+                // if that fails, try adding the user to an existing room
+                try {
+                    await findExistingRoomForUser(user)
+                    return res.status(200).json("Found existing room")
+                }
+                catch (err) {
+                    console.error(err)
+                    return res.status(500).json("Failed to form a new room, or join an existing one")
+                }
             }
         }
         else {

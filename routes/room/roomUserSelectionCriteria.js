@@ -54,8 +54,8 @@ function roomUserSelectionCriteria({
 
     if (checkProfileComplete) {
         // they have completed their profile (added photos...)
-        obj["profileComplete"] = true
-        obj["waitingForRoom"] = true
+        // obj["profileComplete"] = true
+        // obj["waitingForRoom"] = true
     }
 
     return obj
