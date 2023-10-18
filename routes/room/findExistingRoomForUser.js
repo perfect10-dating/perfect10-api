@@ -11,16 +11,16 @@ const DateModel = require("../../models/DateModel");
  */
 function roomSelection(userObject) {
     return RoomModel.find({
-        // location: {
-        //     $near: {
-        //         // convert distance in miles to meters, measure only radially
-        //         $maxDistance: (userObject.maxDistance / 2) * 1609,
-        //         $geometry: {
-        //             type: "Point",
-        //             coordinates: userObject.location.coordinates
-        //         }
-        //     }
-        // },
+        location: {
+            $near: {
+                // convert distance in miles to meters, measure only radially
+                $maxDistance: (userObject.maxDistance / 2) * 1609,
+                $geometry: {
+                    type: "Point",
+                    coordinates: userObject.location.coordinates
+                }
+            }
+        },
         $or: [
 
             // Side 1 Criteria (one-sided dating)
@@ -33,7 +33,7 @@ function roomSelection(userObject) {
                 "sideOneAgeRange.min": {$lte: userObject.age, $gte: userObject.ageRange.min},
                 "sideOneAgeRange.max": {$gte: userObject.age, $lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$lt: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT+1},
+                sideOneSize: {$lt: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MAXIMUM+1},
             },
             // Side 1 Criteria (two-sided dating)
             {
@@ -49,7 +49,7 @@ function roomSelection(userObject) {
                 "sideOneAgeRange.min": {$gte: userObject.ageRange.min},
                 "sideOneAgeRange.max": {$lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
+                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MAXIMUM},
             },
             // Side 2 Criteria (two-sided dating)
             {
@@ -65,7 +65,7 @@ function roomSelection(userObject) {
                 "sideTwoAgeRange.min": {$gte: userObject.ageRange.min},
                 "sideTwoAgeRange.max": {$lte: userObject.ageRange.max},
                 // check length
-                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT},
+                sideOneSize: {$lt: appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MAXIMUM},
             }
         ],
         bannedUserList: {$ne: userObject._id},
@@ -91,7 +91,15 @@ async function findExistingRoomForUser(userObject) {
                 let isSideTwo = userObject.identity === room.sideTwoIdentity
                 let isOneSided = room.isSingleSided
 
-                // screen users using Dates
+                // if this is a two-sided room and the side we're trying to join is larger than our potential partners,
+                // we skip it (because we don't want super unbalanced rooms)
+                if (!isOneSided &&
+                    ((room.sideOne.length > room.sideTwo.length && !isSideTwo) ||
+                        (room.sideTwo.length > room.sideOne.length && isSideTwo))) {
+                    continue;
+                }
+
+                // screen our user using Dates
                 let screenedUsers = await screenUsers({
                     DateModelObject: DateModel,
                     usersToScreen: [userObject],
@@ -99,6 +107,7 @@ async function findExistingRoomForUser(userObject) {
                     screeningUsers: ((isSideTwo || isOneSided) ? room.sideOne : room.sideTwo)
                 })
 
+                // screenedUsers has length 0 or 1. If 1, this is a room that we can join.
                 if (screenedUsers.length !== 0) {
                     chosenRoom = room
                     break

@@ -8,6 +8,7 @@ const {getUserStdev, getGroupScoreRange} = require("../userGroup/getGroupScoreRa
 const {dateCompetitorFindFunction} = require("./dateCompetitorFindFunction");
 const {findExistingRoomForUser} = require("./findExistingRoomForUser");
 const {sendPinpointMessage} = require("../utils/sendPinpointMessage");
+const {appConfiguration} = require("../appConfiguration");
 
 const formRoomFunction = (user, checkProfileComplete) => {
     return new Promise(async (resolve, reject) => {
@@ -87,7 +88,7 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
             console.log(`FORM-ROOM: completed find; ${potentialPartners.length} potentialPartners and ${competitors.length} competitors`)
 
             if (isOneSided) {
-                if (potentialPartners.length < 10) {
+                if (potentialPartners.length < appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM) {
                     console.error("FORM-ROOM: rejecting due too few potentialPartners for one-sided dating")
                     return reject("Not enough potentialPartners for one-sided dating")
                 }
@@ -96,7 +97,8 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 }
             }
             else {
-                if (potentialPartners.length < 10 || competitors.length < 9) {
+                if (potentialPartners.length < appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM ||
+                    competitors.length < appConfiguration.TWO_SIDED_COMPETITOR_COUNT_MINIMUM) {
                     console.error("FORM-ROOM: rejecting due to two few potentialPartners or competitors for 2-sided dating")
                     return reject("Too few potentialPartners or competitors")
                 }

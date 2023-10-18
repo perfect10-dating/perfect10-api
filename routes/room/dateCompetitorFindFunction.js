@@ -275,7 +275,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
             if (isOneSided) {
                 let ageRange = {min: user.age, max: user.age}
                 let offset = 0
-                while (potentialPartners.length < appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT) {
+                while (potentialPartners.length < appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM) {
                     let newPotentialPartners = await findUserFunction({
                         UserModelObject,
                         user,
@@ -291,7 +291,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     })
 
                     // we can't get enough new partners to fill the criteria
-                    if (newPotentialPartners.length < (appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT-potentialPartners.length)) {
+                    if (newPotentialPartners.length < (appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM-potentialPartners.length)) {
                         return reject(`One-sided dating room generation failed: not enough eligible partners (found ${newPotentialPartners.length})`)
                     }
 
@@ -309,14 +309,14 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         // just the average of the ageRange; a pretty likely place for user ages to center
                         setPointAge: (user.ageRange.max-user.ageRange.min)/2,
                         oldUserArray: potentialPartners,
-                        newUserAmount: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT
+                        newUserAmount: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM
                     })
                     // because this is one-sided: all users must be more permissive that the currently existing
                     // user age ranges
                     ageRange = newSelectionAgeRange
                     potentialPartners = newUserArray
 
-                    console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT} partners for one-sided`)
+                    console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM} partners for one-sided`)
                     offset += USERS_TO_GET_PER_PASS
                 }
 
@@ -329,7 +329,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                 let sideOneSelectionAgeRange
                 let sideTwoSelectionAgeRange
                 let offset = 0
-                while (potentialPartners.length < appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT) {
+                while (potentialPartners.length < appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM) {
                     let newPotentialPartners = await findUserFunction({
                         UserModelObject,
                         user,
@@ -345,7 +345,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     })
 
                     // we can't get enough new partners to fill the criteria
-                    if (newPotentialPartners.length < (appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT-potentialPartners.length)) {
+                    if (newPotentialPartners.length < (appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM-potentialPartners.length)) {
                         return reject(`Two-sided dating room generation failed: not enough eligible partners (found ${newPotentialPartners.length}`)
                     }
 
@@ -363,7 +363,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                         // just the average of the ageRange; a pretty likely place for user ages to center
                         setPointAge: (user.ageRange.max-user.ageRange.min)/2,
                         oldUserArray: potentialPartners,
-                        newUserAmount: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT
+                        newUserAmount: appConfiguration.ONE_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM
                     })
                     // because this is two-sided:
                     //  the newSelectionAgeRange (bounds the ages on sideOne) becomes the ageRange on sideTwo
@@ -372,13 +372,13 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     sideTwoSelectionAgeRange = newAgeRange
                     potentialPartners = newUserArray
 
-                    console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT} partners for two-sided`)
+                    console.log(`DATE-COMPETITOR-FIND: have ${potentialPartners.length} / ${appConfiguration.TWO_SIDED_POTENTIAL_PARTNER_COUNT_MINIMUM} partners for two-sided`)
                     offset += USERS_TO_GET_PER_PASS
                 }
 
                 // TWO-SIDED DATING: Find competitors
                 offset = 0
-                while (competitors.length < appConfiguration.TWO_SIDED_COMPETITOR_COUNT) {
+                while (competitors.length < appConfiguration.TWO_SIDED_COMPETITOR_COUNT_MINIMUM) {
                     let newCompetitors = await findUserFunction({
                         UserModelObject,
                         user,
@@ -394,7 +394,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     })
 
                     // we can't get enough new partners to fill the criteria
-                    if (newCompetitors.length < (appConfiguration.TWO_SIDED_COMPETITOR_COUNT-competitors.length)) {
+                    if (newCompetitors.length < (appConfiguration.TWO_SIDED_COMPETITOR_COUNT_MINIMUM-competitors.length)) {
                         return reject(`Two-sided dating room generation failed: not enough eligible competitors (found ${newCompetitors.length})`)
                     }
 
@@ -410,7 +410,7 @@ async function dateCompetitorFindFunction({user, choiceIdentity,
                     // NOTE -- we don't calculate age range here because age selection is already done by
                     // leastPermissiveAgeRange, and ageRange is determined by sideOneAgeRange
 
-                    console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${appConfiguration.TWO_SIDED_COMPETITOR_COUNT} competitors for two-sided`)
+                    console.log(`DATE-COMPETITOR-FIND: have ${competitors.length} / ${appConfiguration.TWO_SIDED_COMPETITOR_COUNT_MINIMUM} competitors for two-sided`)
                     offset += USERS_TO_GET_PER_PASS
                 }
 
