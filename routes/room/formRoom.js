@@ -124,7 +124,9 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
                 sideTwoIdentity: user.identity,
                 sideTwoScores: {min: userGroupStdevData.minScore, max: userGroupStdevData.maxScore},
                 sideTwoAgeRange,
-                sideTwoSize: competitors.length
+                sideTwoSize: competitors.length,
+                
+                location: user.location,
             })
 
             console.log("FORM-ROOM: Saving room")
@@ -230,6 +232,7 @@ module.exports = (router) => {
 
             try {
                 await formRoomFunction(user, true)
+                
                 return res.status(200).json("Formed a new room")
             } catch (err) {
                 console.error(err)

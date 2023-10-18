@@ -38,6 +38,19 @@ const RoomSchema = new mongoose.Schema({
 
   // the users that we DO NOT allow back into the room (they swapped out)
   bannedUserList: [{type: ObjectId, ref: 'user', required: true}],
+  
+  // location (represents the room matchmaking location)
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'], // 'location.type' must be 'Point'
+      required: true
+    },
+    coordinates: {
+      type: [Number], // longitude, then latitude
+      required: true
+    },
+  },
 
 }, {timestamps: true})
 

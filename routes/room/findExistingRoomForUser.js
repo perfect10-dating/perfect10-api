@@ -82,6 +82,15 @@ function roomSelection(userObject) {
 async function findExistingRoomForUser(userObject) {
     return new Promise(async (resolve, reject) => {
         try {
+            if (userObject.temporarilyLocked || userObject.mustReviewDate || !userObject.profileComplete) {
+                return reject("User is unsuitable for joining a new room")
+            }
+
+            // if the userObject is already in a room, we don't allow them to join a new one
+            if (!!userObject.currentRoom) {
+                return reject("User is already in a room")
+            }
+
             let potentialRooms = await roomSelection(userObject)
 
             console.log(potentialRooms)
