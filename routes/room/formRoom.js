@@ -157,16 +157,16 @@ group and ${JSON.stringify(otherGroupStdevData)} for the other group`)
             if (process.env.MONGO_DB) {
                 console.log("FORM-ROOM: Texting people in the new room")
 
-                await Promise.all([potentialPartners, competitors]).map(userArray => {
+                await Promise.all([potentialPartners, competitors].map(userArray => {
                     return Promise.all(userArray.map(indUser => {
                         return sendPinpointMessage({
                             messageType: "PROMOTIONAL",
                             destinationNumber: indUser.phoneNumber,
                             message:
-`Hi ${indUser.firstName}! This is Rizzly, letting you know that we created a room for you. View your matches now at https://rizz.ly`
+                              `Hi ${indUser.firstName}! This is Rizzly, letting you know that we created a room for you. View your matches now at https://rizz.ly`
                         })
                     }))
-                })
+                }))
             }
 
             // console.log({potentialPartners, competitors})

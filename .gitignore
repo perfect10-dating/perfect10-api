@@ -4,4 +4,4 @@ node_modules
 .DS_Store
 .idea/modules.xml
 .idea/perfect10-api.iml
-.disabledenv
+.envignore

@@ -1,6 +1,7 @@
 // this is the entry point to the application
 
 'use strict'
+require('dotenv').config()
 
 console.log('\nStarting Rizzly API server...\n')
 
