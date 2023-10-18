@@ -18,12 +18,16 @@ module.exports = (router) => {
         for (let user of uvmUsers.data) {
           // skip teachers and freshmen
           if (!user.ou || (
-            user.ou["0"] !== "Graduate" && user.ou["0"] !== "Sophomore" && user.ou["0"] !== "Junior" && user.ou["0"] !== "Senior")
+            user.ou["0"] !== "Sophomore" && user.ou["0"] !== "Junior" && user.ou["0"] !== "Senior")
           ) {
             continue
           }
     
-          let email = user.edupersonprincipalname["0"]
+          if (!user.mail || !user.mail["0"]) {
+            continue
+          }
+          
+          let email = user.mail["0"]
     
           console.log(`Sending email to ${email}, who is a ${user.ou["0"]}`)
     
